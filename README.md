@@ -69,6 +69,40 @@ kubectl apply \
 
 Wait for whereabouts pods to become active
 
+## Argo
+
+Perform the below instructions to install multus and IPAM whereabouts
+
+Do this for all three clusters: hub, core and edge clusters
+
+### Install Argo workflow manager
+
+[Set up argo](./docs/argo.md)
+
+### Apply argo roles
+
+Have Argo to run free5gc workflows under `5g-core` namespace.
+
+```
+kubectl create namespace 5g-core
+kubectl apply -f workflows/argo/role.yaml
+```
+
+### Apply common argo templates
+
+```
+kubectl apply -f  workflows/common-templates  -n 5g-core
+```
+
+## 5G Operator
+
+5G Operator acts as a VMFM for free5gc network functions
+
+Perform the [following](./docs/5g-operator.md) instructions to install the 5G Operator
+
+Do this for both core and edge clusters
+
+
 ## gtp5g kernel module
 
 Perform the below instructions to install the gtp5g kernel module that will be used by the dataplane function

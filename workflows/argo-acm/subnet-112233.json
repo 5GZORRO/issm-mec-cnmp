@@ -1,0 +1,15 @@
+{
+    "registry": "84.88.32.158:5000",
+
+    "cluster_core": "bcn-core",
+    "cluster_edge": "bcn-edge",
+    "smf_name": "smf-sample",
+    "sst": "1",
+    "sd": "112233",
+
+    "network_name": "gilan",
+    "network_master": "ens3",
+    "network_range": "10.20.0.0/24",
+    "network_start": "10.20.0.2",
+    "network_end": "10.20.0.50"
+}

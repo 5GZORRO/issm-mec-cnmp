@@ -1,0 +1,231 @@
+# submit this from ACM
+# TODO: upf name in smf to be consistent with upf cr name
+# TODO: networks to be deinfed in workflow properties
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: fiveg-subnet-
+spec:
+  entrypoint: handlerequest
+  arguments:
+    parameters:
+    - name: registry
+      value: "OVERRIDE"
+
+    - name: cluster_core
+      value: "OVERRIDE"
+    - name: cluster_edge
+      value: "OVERRIDE"
+
+    - name: smf_name
+      value: "OVERRIDE"
+
+    - name: sst
+      value: "OVERRIDE"
+    - name: sd
+      value: "OVERRIDE"
+
+    - name: network_name
+      # OVERRIDE values implies not to create datanetwork
+      value: "OVERRIDE"
+    - name: network_master
+      value: "OVERRIDE"
+    - name: network_range
+      value: "OVERRIDE"
+    - name: network_start
+      value: "OVERRIDE"
+    - name: network_end
+      value: "OVERRIDE"
+
+
+  templates:
+  - name: handlerequest
+    dag:
+      tasks:
+      - name: create-subnet-deploy-subscription
+        # TODO: wait on status
+        template: create-subnet-deploy-subscription
+
+      - name: wait-for-subnet-status
+        dependencies: [create-subnet-deploy-subscription]
+        template: delay-seconds
+        arguments:
+          parameters:
+          - name: seconds
+            value: 130
+
+      - name: get-sbi-ip
+        dependencies: [wait-for-subnet-status]
+        # there should be a single UPF created for this slice sd
+        template: kubectl-jq-script
+        arguments:
+          parameters:
+          - name: subscription_name
+            value: 5g-subnet-deploy-{{workflow.parameters.sd}}
+          - name: cluster_name
+            value: "{{workflow.parameters.cluster_edge}}"
+          - name: namespace
+            value: "{{workflow.namespace}}"
+          - name: channel_name
+            value: gitops
+          - name: package_name
+            value: fiveg-subnet-deploy
+          - name: cr_name
+            value: Workflow
+          - name: network_name
+            value: sbi
+
+      - name: get-up-ip
+        dependencies: [wait-for-subnet-status]
+        # there should be a single UPF created for this slice sd
+        template: kubectl-jq-script
+        arguments:
+          parameters:
+          - name: subscription_name
+            value: 5g-subnet-deploy-{{workflow.parameters.sd}}
+          - name: cluster_name
+            value: "{{workflow.parameters.cluster_edge}}"
+          - name: namespace
+            value: "{{workflow.namespace}}"
+          - name: channel_name
+            value: gitops
+          - name: package_name
+            value: fiveg-subnet-deploy
+          - name: cr_name
+            value: Workflow
+          - name: network_name
+            value: up
+
+      - name: create-subnet-configure-subscription
+        dependencies: [get-sbi-ip, get-up-ip]
+        template: create-subnet-configure-subscription
+        arguments:
+          parameters:
+          - name: upf_sbi
+            value: "{{tasks.get-sbi-ip.outputs.result}}"
+          - name: upf_up
+            value: "{{tasks.get-up-ip.outputs.result}}"
+
+  - name: create-subnet-deploy-subscription
+    resource:
+      action: create
+      setOwnerReference: true
+      manifest: |
+        apiVersion: apps.open-cluster-management.io/v1
+        kind: Subscription
+        metadata:
+          annotations:
+            apps.open-cluster-management.io/github-branch: multi-cluster-1
+            apps.open-cluster-management.io/github-path: subnet-deploy-wf
+          name: 5g-subnet-deploy-{{workflow.parameters.sd}}
+        spec:
+          channel: gitops-chn-ns/gitops
+          placement:
+            clusters:
+            - name: {{workflow.parameters.cluster_edge}}
+          packageOverrides:
+          - packageName: fiveg-subnet-deploy
+            packageOverrides:
+            - path: metadata.name
+              value: 5g-subnet-deploy-{{workflow.parameters.sd}}
+            - path: spec.arguments.parameters
+              value:
+              - name: registry
+                value: {{workflow.parameters.registry}}
+
+              - name: networks
+                # management and useplane networks to get created at the edge
+                value: |
+                  [
+                    {
+                      "name": "sbi",
+                      "master": "ens3",
+                      "range": "10.100.200.0/24",
+                      "start": "10.100.200.21",
+                      "end": "10.100.200.40"
+                    },
+                    {
+                      "name": "up",
+                      "master": "ens3",
+                      "range": "192.168.1.0/24",
+                      "start": "192.168.1.251",
+                      "end": "192.168.1.253"
+                    }
+                  ]
+                
+              - name: network_name
+                value: "{{workflow.parameters.network_name}}"
+              - name: network_master
+                value: "{{workflow.parameters.network_master}}"
+              - name: network_range
+                value: "{{workflow.parameters.network_range}}"
+              - name: network_start
+                value: "{{workflow.parameters.network_start}}"
+              - name: network_end
+                value: "{{workflow.parameters.network_end}}"
+
+  - name: create-subnet-configure-subscription
+    inputs:
+      parameters:
+      - name: upf_sbi
+      - name: upf_up
+    resource:
+      action: create
+      setOwnerReference: true
+      manifest: |
+        apiVersion: apps.open-cluster-management.io/v1
+        kind: Subscription
+        metadata:
+          annotations:
+            apps.open-cluster-management.io/github-branch: multi-cluster-1
+            apps.open-cluster-management.io/github-path: subnet-configure-wf
+          name: 5g-subnet-configure-{{workflow.parameters.sd}}
+        spec:
+          channel: gitops-chn-ns/gitops
+          placement:
+            clusters:
+            - name: {{workflow.parameters.cluster_core}}
+          packageOverrides:
+          - packageName: fiveg-subnet-configure
+            packageOverrides:
+            - path: metadata.name
+              value: 5g-subnet-configure-{{workflow.parameters.sd}}
+            - path: spec.arguments.parameters
+              value:
+              - name: smf_name
+                value: {{workflow.parameters.smf_name}}
+              - name: upf_sbi
+                value: {{inputs.parameters.upf_sbi}}
+              - name: upf_up
+                value: {{inputs.parameters.upf_up}}
+              - name: sst
+                value: "{{workflow.parameters.sst}}"
+              - name: sd
+                value: "{{workflow.parameters.sd}}"
+
+  - name: delay-seconds
+    inputs:
+      parameters:
+      - name: seconds
+    container:
+      image: alpine:3.7
+      command: [sh, -c]
+      args: ["sleep {{inputs.parameters.seconds}};"]
+
+  - name: kubectl-jq-script
+    # NOTE: in this version, subscription CR must exist already with its status being set
+    inputs:
+      parameters:
+      - name: subscription_name
+      - name: cluster_name
+      - name: namespace
+      - name: channel_name
+      - name: package_name
+      - name: cr_name
+      - name: network_name
+    script:
+      image: "{{workflow.parameters.registry}}/argoproj/argoexec:v2.12.0-rc2"
+      imagePullPolicy: IfNotPresent
+      command: [sh]
+      source: |
+        kubectl get subscriptions.apps.open-cluster-management.io {{inputs.parameters.subscription_name}} -o json | jq '.status.statuses."{{inputs.parameters.cluster_name}}".packages."{{inputs.parameters.channel_name}}-{{inputs.parameters.cr_name}}-{{inputs.parameters.package_name}}".resourceStatus.outputs.parameters[0].value' | jq -r . | jq -r '.[] | select(.name=="{{inputs.parameters.namespace}}/{{inputs.parameters.network_name}}") | .ips[0]'

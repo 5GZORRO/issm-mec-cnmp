@@ -1,0 +1,78 @@
+# This template runs on the target cluster
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: nf-template
+spec:
+  templates:
+  - name: create-nf
+    # Create a netowork function CR
+    #
+    # Parameters:
+    # nf_apiversion: api version (e.g. 5g.ibm.com/v1alpha1)
+    # nf_kind: CR type (e.g. Amf, Upf, Smf, ...)
+    # success_condition: a query to wait on this create operation (argo lable query)
+    # nf_name: CR name
+    # nf_spec: CR spec (json)
+    inputs:
+      parameters:
+      - name: nf_apiversion
+      - name: nf_kind
+      - name: success_condition
+      - name: nf_name
+      - name: nf_spec
+    resource:
+      action: create
+      successCondition: "{{inputs.parameters.success_condition}}"
+      setOwnerReference: true
+      manifest: |
+        apiVersion: {{inputs.parameters.nf_apiversion}}
+        kind: {{inputs.parameters.nf_kind}}
+        metadata:
+          name: {{inputs.parameters.nf_name}}
+        spec: {{inputs.parameters.nf_spec}}
+
+  - name: read-pod
+    # Retrieve pod object of the managed 5G CR and return its ipaddresses.
+    # Note: ipaddresses are being also asigned as a global variable of this calling
+    # Workflow instance
+    #
+    # Parameters:
+    # pod_name: the name of the pod
+    #
+    # Outputs:
+    # multus-ips: ip addresses of this pod (json)
+    inputs:
+      parameters:
+      - name: pod_name
+    resource:
+      action: get
+      manifest: |
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: {{inputs.parameters.pod_name}}
+    outputs:
+      parameters:
+      - name: multus-ips
+        valueFrom:
+          jsonPath: '{.metadata.annotations.k8s\.v1\.cni\.cncf\.io\/network\-status}'
+        globalName: "{{inputs.parameters.pod_name}}"
+
+  - name: create-tr
+    # Identical to create-nf but without successCondition.
+    inputs:
+      parameters:
+      - name: nf_apiversion
+      - name: nf_kind
+      - name: nf_name
+      - name: nf_spec
+    resource:
+      action: create
+      setOwnerReference: true
+      manifest: |
+        apiVersion: {{inputs.parameters.nf_apiversion}}
+        kind: {{inputs.parameters.nf_kind}}
+        metadata:
+          name: {{inputs.parameters.nf_name}}
+        spec: {{inputs.parameters.nf_spec}}
