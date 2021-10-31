@@ -139,7 +139,9 @@ sudo ip link set ens3 promisc on
 
 ## UERANSIM
 
-Perform the below instructions to install ue ran simulator: https://github.com/aligungr/UERANSIM.git
+https://github.com/aligungr/UERANSIM.git
+
+Perform the below instructions to install ue ran simulator
 
 Do this for both gNB and UE VMs
 
@@ -170,4 +172,129 @@ Build
 ```
 cd ~/UERANSIM
 make
+```
+
+## Deployment
+
+### **Deploy core**
+
+Kick off free5gc core deployment
+
+Log into ACM hub cluster
+
+```
+cd ~/issm-mec-cnmp
+argo -n 5g-core  submit workflows/argo-acm/fiveg-core.yaml --parameter-file workflows/argo-acm/core.json --watch
+```
+
+wait for the flow to complete
+
+### Start gNB
+
+Log into gNB VM (192.168.1.133)
+
+Customize free5gc-gnb.yaml to support the two slices (010203, 112233)
+
+```diff
+index 81bb13b..e28f0be 100644
+--- a/config/free5gc-gnb.yaml
++++ b/config/free5gc-gnb.yaml
+@@ -5,13 +5,13 @@ nci: '0x000000010'  # NR Cell Identity (36-bit)
+ idLength: 32        # NR gNB ID length in bits [22...32]
+ tac: 1              # Tracking Area Code
+
+-linkIp: 127.0.0.1   # gNB's local IP address for Radio Link Simulation (Usually same with local IP)
+-ngapIp: 127.0.0.1   # gNB's local IP address for N2 Interface (Usually same with local IP)
+-gtpIp: 127.0.0.1    # gNB's local IP address for N3 Interface (Usually same with local IP)
++linkIp: 192.168.1.133   # gNB's local IP address for Radio Link Simulation (Usually same with local IP)
++ngapIp: 192.168.1.133   # gNB's local IP address for N2 Interface (Usually same with local IP)
++gtpIp: 192.168.1.133    # gNB's local IP address for N3 Interface (Usually same with local IP)
+
+ # List of AMF address information
+ amfConfigs:
+-  - address: 127.0.0.1
++  - address: 192.168.1.250
+     port: 38412
+
+ # List of supported S-NSSAIs by this gNB
+ slices:
+   - sst: 0x1
+     sd: 0x010203
++  - sst: 0x1
++    sd: 0x112233
+
+ # Indicates whether or not SCTP stream number errors should be ignored.
+ ignoreStreamIds: true
+```
+
+start gnb
+
+```
+cd ~/UERANSIM/build
+./nr-gnb  -c ../config/free5gc-gnb.yaml
+```
+
+### Subscribe UE
+
+Login to free5gc portal and subscribe your ue
+
+Browse to `http://<core cluster master ipaddress>:30050`
+login with `admin/free5gc`
+
+New subscriber -> accept all defaults -> Submit  
+
+
+### **Deploy subnet slice** (010203)
+
+Log into ACM hub cluster
+
+deploy subnet and wait for the flow to complete
+
+```
+argo -n 5g-core  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch
+```
+
+wait for the flow to complete
+
+### Connect UE to slice
+
+Log into UE VM (192.168.1.107)
+
+Customize free5gc-ue.yaml to use slice 010203
+
+```diff
+--- a/config/free5gc-ue.yaml
++++ b/config/free5gc-ue.yaml
+@@ -20,7 +20,7 @@ imeiSv: '4370816125816151'
+
+ # List of gNB IP addresses for Radio Link Simulation
+ gnbSearchList:
+-  - 127.0.0.1
++  - 172.15.0.211
+
+ # Initial PDU sessions to be established
+ sessions:
+@@ -38,7 +38,7 @@ configured-nssai:
+ # Default Configured NSSAI for this UE
+ default-nssai:
+   - sst: 1
+-    sd: 1
++    sd: 010203
+
+ # Supported encryption algorithms by this UE
+ integrity:
+```
+
+Establish PDU session on this slice
+
+```bash
+sudo -s
+cd ~/UERANSIM/build
+./nr-ue -c ../config/free5gc-ue.yaml
+```
+
+Open another terminal on UE VM and perform the below to transfer data over this slice
+
+```
+curl --interface uesimtun0 google.com
 ```
