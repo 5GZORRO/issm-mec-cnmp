@@ -87,7 +87,24 @@ curl -X POST \
 }'
 ```
 
+### Get subnetslice
 
+Retreieve the progress, status and parameters of a given subnet slice
+
+```
+curl -X GET http://<ocm master ipaddress>:30055/get_workflow/<name>
+
+REST path:
+    ocm master ipaddress - ipaddress of OCM Hub.
+    name - the name of the subnetslice as being returned from the POST endpoint (str)
+```
+
+Example:
+
+```bash
+curl -X GET \
+  http://192.168.1.117:30055/subnetslice/fiveg-subnet-010203
+```
 
 ## Build (**relevant for developers only**)
 

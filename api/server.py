@@ -41,16 +41,7 @@ def raise_for_status(r):
 def core_workflow_template(workflow_cr, **kwargs):
     def _build_params(**dn):
         if dn is not None:
-            # if network_name provided, it is assumed that *all* network attrs there
-            # as well
             return [dict(name=k, value=dn[k]) for k in dn]
-#             if 'network_name' not in kwargs:
-#                 l = l + ([dict(name='network_name', value='OVERRIDE'),
-#                           dict(name='network_master', value='OVERRIDE'),
-#                           dict(name='network_range', value='OVERRIDE'),
-#                           dict(name='network_start', value='OVERRIDE'),
-#                           dict(name='network_end', value='OVERRIDE')])
-#             return l
         else:
             return None
 
@@ -91,6 +82,28 @@ class Proxy:
         return {
             'workflow_name': workflow_cr['metadata']['name']
             }
+
+    def get_workflow(self, name):
+        sys.stdout.write('Requesting workflow for name '+name+'\n')
+
+        global namespace
+        workflow = self.api.get_namespaced_custom_object(
+            group="argoproj.io",
+            version="v1alpha1",
+            namespace=namespace,
+            plural="workflows",
+            name=name)
+
+        sys.stdout.write(str(workflow)+'\n')
+
+        # list of dict name, value pairs
+        workflow_parameters = workflow.get('spec', {}).get('arguments', {}).get('parameters', [])
+        return {
+            'name': workflow['metadata']['name'],
+            'phase': workflow['status']['phase'],
+            'progress': workflow['status']['progress'],
+            'workflow_parameters': workflow_parameters
+        }
 
 
 proxy = flask.Flask(__name__)
@@ -202,6 +215,22 @@ def subnet():
 
     sys.stdout.write('Exit /subnetslice %s\n' % str(response))
     return response
+
+
+@proxy.route("/subnetslice/<name>",  methods=['GET'])
+def get_subnetslice(name):
+    try:
+        flow_json = proxy_server.get_workflow(name)
+        response = flask.jsonify(flow_json)
+        response.status_code = 200
+        return response
+    except HTTPException as e:
+        return e
+    except Exception as e:
+        response = flask.jsonify({'error': 'Internal error. {}'.format(e)})
+        response.status_code = 500
+        return response
+
 
 
 def main():
