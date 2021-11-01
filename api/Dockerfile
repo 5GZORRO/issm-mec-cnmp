@@ -14,7 +14,6 @@ RUN pip install --no-cache-dir gevent==1.2.1 flask>=1.0.0 requests==2.13.0 kuber
 RUN mkdir -p /apiServer
 ADD server.py /apiServer/
 
-ADD fiveg-core.yaml /
 ADD fiveg-subnet.yaml /
 
 CMD ["/bin/bash", "-c", "cd apiServer && python -u server.py"]

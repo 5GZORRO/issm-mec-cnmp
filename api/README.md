@@ -92,11 +92,11 @@ curl -X POST \
 Retrieve the progress, status and parameters of a given subnet slice
 
 ```
-curl -X GET http://<ocm master ipaddress>:30055/get_workflow/<name>
+curl -X GET http://<ocm master ipaddress>:30055/subnetslice/<subnet_name>
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
-    name - the name of the subnetslice as being returned from the POST endpoint (str)
+    subnet_name - the name of the subnetslice as being returned from the POST endpoint (str)
 ```
 
 Example:
