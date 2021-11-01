@@ -1,6 +1,6 @@
 # Api service
 
-Component responsible for providing management API endpoint service for ISSM-MEC-CNMP.
+Component responsible for providing API endpoints for ISSM-MEC-CNMP.
 
 ## Deploy the service
 
@@ -89,7 +89,7 @@ curl -X POST \
 
 ### Get subnetslice
 
-Retreieve the progress, status and parameters of a given subnet slice
+Retrieve the progress, status and parameters of a given subnet slice
 
 ```
 curl -X GET http://<ocm master ipaddress>:30055/get_workflow/<name>
