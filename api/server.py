@@ -39,14 +39,23 @@ def raise_for_status(r):
 
 
 def core_workflow_template(workflow_cr, **kwargs):
-    def _build_dn(**dn):
+    def _build_params(**dn):
         if dn is not None:
+            # if network_name provided, it is assumed that *all* network attrs there
+            # as well
             return [dict(name=k, value=dn[k]) for k in dn]
+#             if 'network_name' not in kwargs:
+#                 l = l + ([dict(name='network_name', value='OVERRIDE'),
+#                           dict(name='network_master', value='OVERRIDE'),
+#                           dict(name='network_range', value='OVERRIDE'),
+#                           dict(name='network_start', value='OVERRIDE'),
+#                           dict(name='network_end', value='OVERRIDE')])
+#             return l
         else:
             return None
 
     workflow_cr['metadata']['name'] = 'fiveg-subnet-%s' % kwargs['sd']
-    workflow_cr['spec']['arguments']['parameters'] = _build_dn(**kwargs)
+    workflow_cr['spec']['arguments']['parameters'] = _build_params(**kwargs)
 
     return workflow_cr
 
@@ -78,7 +87,7 @@ class Proxy:
             plural='workflows',
             body=workflow_cr)
 
-        sys.stdout.write('Done creating subscription\n')
+        sys.stdout.write('Done creating workflow\n')
         return {
             'workflow_name': workflow_cr['metadata']['name']
             }
@@ -123,7 +132,7 @@ def subnet():
     """
     Create a subnet slice.
 
-    :param registry: url to private image registry to be used for the deployment
+    :param registry: url to private image registry to be used for the deployment. Optional
     :type registry: ``str``
 
     :param cluster_core: the cluster of where the core is deployed
@@ -141,18 +150,7 @@ def subnet():
     :param sd: slice differentiator e.g. "010203"
     :type sd: ``str``
 
-    :param datanetwork: local data network to connect the slice with.
-                        If 'network_name' exists, it contains the following keys which are mandatory:
-                        network_name: the name of the network to create
-                        network_master: the interface to bind macvlan to
-                        network_range: network subnet cidr format
-                        network_start: start ipaddress
-                        network_end: end ipaddress
-                        (Optional)
-    
-    :type datanetwork: ``json``
-
-
+    TODO: add network parameters..
     """
     sys.stdout.write('Received subnetslice request\n')
     try:
@@ -164,7 +162,13 @@ def subnet():
 
         smf_name = value.get('smf_name', "smf-sample")
         sst = value.get('sst', "1")
-        sd = value['cluster_core']
+        sd = value['sd']
+
+        network_name = value.get('network_name', 'OVERRIDE')
+        network_master = value.get('network_master', 'OVERRIDE')
+        network_range = value.get('network_range', 'OVERRIDE')
+        network_start = value.get('network_start', 'OVERRIDE')
+        network_end = value.get('network_end', 'OVERRIDE')
 
         with open('/fiveg-subnet.yaml') as f:
             fiveg_subnet_yaml = yaml.load(f, Loader=yaml.FullLoader)
@@ -172,7 +176,13 @@ def subnet():
         res_json = proxy_server.create_workflow(
             workflow_cr=fiveg_subnet_yaml, registry=registry,
             cluster_core=cluster_core, cluster_edge=cluster_edge,
-            smf_name=smf_name, sst=sst, sd=sd)
+            smf_name=smf_name, sst=sst, sd=sd,
+            network_name=network_name,
+            network_master=network_master,
+            network_range=network_range,
+            network_start=network_start,
+            network_end=network_end
+        )
         response = flask.jsonify(res_json)
         response.status_code = 200
         return response

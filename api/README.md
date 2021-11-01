@@ -38,14 +38,21 @@ REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
 
 Data payload:
-    cluster_core  - TODO (str)
-    cluster_edge  - TODO (str)
-    sst           - TODO (str)
-    sd            - TODO (str)
-    smf_name      - TODO (str) Optional
+    cluster_core   - the cluster of where the core is deployed (str)
+    cluster_edge   - the edge (cluster) of which the subnet will be deployed (str)
+    sst            - the sst of the slice e.g. "1" (str)
+    sd             - slice differentiator e.g. "010203" (str)
+    smf_name       - the name of the SMF function instance to re-configure (str)
+    network_name   - the name of the internal network to attach the slice with (str) Optional.
+                     note: if provided, the below is required
+
+    network_master - master interface on the worker node (str)
+    network_range  - network range in cidr format (str)
+    network_start  - start ip in the sequence range (str)
+    network_end    - end ip in the sequence range (str)
 ```
 
-Example:
+Example 1:
 
 ```bash
 curl -X POST \
@@ -54,10 +61,32 @@ curl -X POST \
   -d '{
   "cluster_core": "bcn-core",
   "cluster_edge": "bcn-edge",
+  "smf_name": "smf-sample",
   "sst": "1",
   "sd": "010203"
 }'
 ```
+
+Example 2: slice attached to a local datanetwork
+
+```bash
+curl -X POST \
+  http://192.168.1.117:30055/subnetslice \
+  -H 'content-type: application/json' \
+  -d '{
+  "cluster_core": "bcn-core",
+  "cluster_edge": "bcn-edge",
+  "smf_name": "smf-sample",
+  "sst": "1",
+  "sd": "010203",
+  "network_name": "gilan",
+  "network_master": "ens3",
+  "network_range": "10.20.0.0/24",
+  "network_start": "10.20.0.2",
+  "network_end": "10.20.0.50"
+}'
+```
+
 
 
 ## Build (**relevant for developers only**)
