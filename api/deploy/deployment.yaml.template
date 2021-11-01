@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+spec:
+  selector:
+    matchLabels:
+      app: api-server
+  replicas: 1
+  minReadySeconds: 1
+  revisionHistoryLimit: 5
+  template:
+    metadata:
+      labels:
+        app: api-server
+    spec:
+      containers:
+      - name: api-server
+        image: "$IMAGE"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: REGISTRY_PRIVATE_FREE5GC
+          value: "$REGISTRY_PRIVATE_FREE5GC"
+        - name: NAMESPACE
+          value: "$NAMESPACE"
