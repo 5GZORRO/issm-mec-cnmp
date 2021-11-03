@@ -71,7 +71,7 @@ Wait for whereabouts pods to become active
 
 ## Argo
 
-Perform the below instructions to install multus and IPAM whereabouts
+Perform the below instructions to install Argo controller
 
 Do this for all three clusters: hub, core and edge clusters
 
