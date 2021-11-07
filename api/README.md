@@ -59,8 +59,8 @@ curl -X POST \
   http://192.168.1.117:30055/subnetslice \
   -H 'content-type: application/json' \
   -d '{
-  "cluster_core": "bcn-core",
-  "cluster_edge": "bcn-edge",
+  "cluster_core": "cluster-2",
+  "cluster_edge": "cluster-1",
   "smf_name": "smf-sample",
   "sst": "1",
   "sd": "010203"
@@ -74,8 +74,8 @@ curl -X POST \
   http://192.168.1.117:30055/subnetslice \
   -H 'content-type: application/json' \
   -d '{
-  "cluster_core": "bcn-core",
-  "cluster_edge": "bcn-edge",
+  "cluster_core": "cluster-2",
+  "cluster_edge": "cluster-1",
   "smf_name": "smf-sample",
   "sst": "1",
   "sd": "010203",

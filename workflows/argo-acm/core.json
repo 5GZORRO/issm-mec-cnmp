@@ -1,5 +1,5 @@
 {
     "registry": "84.88.32.158:5000",
 
-    "cluster_core": "bcn-core"
+    "cluster_core": "cluster-2"
 }

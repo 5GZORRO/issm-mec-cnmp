@@ -4,7 +4,7 @@ https://open-cluster-management.io/
 
 The following instructions are derived from [here](https://open-cluster-management.io/getting-started/quick-start/)
 
-It is assumed that your managed cluster name is `bcn-core`. For the other cluster (edge) change the name accordingly
+It is assumed that your managed cluster name is `cluster-1`. For the other cluster (edge) change the name accordingly
 
 ## Clusteradm CLI
 
@@ -24,7 +24,7 @@ invoke
 clusteradm init
 ```
 
-copy the generated command and replace "managed cluster name" with e.g. `bcn-core`.
+copy the generated command and replace "managed cluster name" with e.g. `cluster-1`.
 
 ### Deploy a klusterlet agent
 
@@ -40,19 +40,19 @@ Log into kubernetes **hub** cluster
 run
 
 ```
-kubectl get csr -w | grep bcn-core
+kubectl get csr -w | grep cluster-1
 ```
 
 ensure to get output like this
 
 ```
-bcn-core-tqcjj   33s   kubernetes.io/kube-apiserver-client   system:serviceaccount:open-cluster-management:cluster-bootstrap   Pending
+cluster-1-tqcjj   33s   kubernetes.io/kube-apiserver-client   system:serviceaccount:open-cluster-management:cluster-bootstrap   Pending
 ```
 
 accept it
 
 ```
-clusteradm accept --clusters bcn-core
+clusteradm accept --clusters cluster-1
 ```
 
 ### Verify ManagedCluster CR created successfully
@@ -72,7 +72,7 @@ In order to place workloads into this cluster, you need to label it with its nam
 Log into kubernetes hub cluster
 
 ```
-kubectl label managedclusters/bcn-core name=bcn-core --overwrite
+kubectl label managedclusters/cluster-1 name=cluster-1 --overwrite
 ```
 
 ## Subscription controller
@@ -123,7 +123,7 @@ kubectl create ns open-cluster-management-agent-addon
 
 Log into kubernetes **hub** cluster
 
-`export MANAGED_CLUSTER_NAME=bcn-core`
+`export MANAGED_CLUSTER_NAME=cluster-1`
 
 ```
 cd ~/multicloud-operators-subscription

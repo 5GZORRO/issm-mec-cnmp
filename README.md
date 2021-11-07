@@ -21,7 +21,7 @@ After creating the three kubernetes clusters, install OCM and register it with t
 
 Follow [these](./docs/ocm.md) instructions to install OCM
 
-**Note:** register the Core and Edge clusters `bcn-core` and `bcn-edge` respectively
+**Note:** register the Core and Edge clusters `cluster-1` and `cluster-2` respectively
 
 ## K8s networking
 
