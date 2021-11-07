@@ -176,6 +176,19 @@ make
 
 ## Deployment
 
+### Pre-requisite
+
+Perform the below before the deployment
+
+Log into ACM hub cluster
+
+Configure the git-subscription channel to point to fiveg packages github
+
+```
+kubectl apply -f workflows/argo-acm/remote-git-sub/01-namespace.yaml
+kubectl apply -f workflows/argo-acm/remote-git-sub/02-channel.yaml
+```
+
 ### **Deploy core**
 
 Kick off free5gc core deployment
