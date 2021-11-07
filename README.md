@@ -137,6 +137,51 @@ Invoke the below against the main network interface
 sudo ip link set ens3 promisc on
 ```
 
+## free5gc images
+
+Log into host installed with docker and has access to docker.pkg.github.com
+
+**Note:** ensure to build images out from free5gc `v3.0.5`
+
+### Build
+
+```
+cd ~
+git clone https://github.com/free5gc/free5gc-compose.git
+cd free5gc-compose
+make base
+docker-compose build
+```
+
+### Tag and Push to registry
+
+**Do this only in case images are not deployed [here](https://github.com/orgs/5GZORRO/packages?tab=packages&visibility=all&sort_by=downloads_asc&q=issm-mec-cnmp)**
+
+Ensure to properly tag the images built from the previous step - into the below names
+
+```
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udr
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nssf
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-amf
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nrf
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf
+```
+
+then push them with `docker push ...`
+
+### Install additional tools into UPF
+
+```
+docker build --tag docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf-tools --force-rm=true -f ./Dockerfile.upf .
+```
+
+then push it with `docker push ...`
+
+
 ## UERANSIM
 
 https://github.com/aligungr/UERANSIM.git
