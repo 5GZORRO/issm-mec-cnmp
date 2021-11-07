@@ -137,6 +137,12 @@ Invoke the below against the main network interface
 sudo ip link set ens3 promisc on
 ```
 
+## 5G Init-container
+
+5G Init-container get invoked during `Init` phase of free5gc NF deployment. It is responsible to setup DNS service name mappings for the various networks
+
+Refer [here](./5ginitcontainer) for more details
+
 ## free5gc images
 
 Log into host installed with docker and has access to docker.pkg.github.com
