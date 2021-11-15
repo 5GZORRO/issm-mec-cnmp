@@ -85,6 +85,12 @@ curl -X POST \
   "network_start": "10.20.0.2",
   "network_end": "10.20.0.50"
 }'
+
+{
+  "subnet_name": "fiveg-subnet-010203"
+}
+
+
 ```
 
 ### Get subnetslice
@@ -104,6 +110,58 @@ Example:
 ```bash
 curl -X GET \
   http://192.168.1.117:30055/subnetslice/fiveg-subnet-010203
+
+{
+  "name": "fiveg-subnet-010203",
+  "phase": "Running",
+  "progress": "1/2",
+  "workflow_parameters": [
+    {
+      "name": "registry",
+      "value": "84.88.32.158:5000"
+    },
+    {
+      "name": "cluster_core",
+      "value": "cluster-2"
+    },
+    {
+      "name": "cluster_edge",
+      "value": "cluster-1"
+    },
+    {
+      "name": "smf_name",
+      "value": "smf-sample"
+    },
+    {
+      "name": "sst",
+      "value": "1"
+    },
+    {
+      "name": "sd",
+      "value": "010203"
+    },
+    {
+      "name": "network_name",
+      "value": "gilan"
+    },
+    {
+      "name": "network_master",
+      "value": "ens3"
+    },
+    {
+      "name": "network_range",
+      "value": "10.20.0.0/24"
+    },
+    {
+      "name": "network_start",
+      "value": "10.20.0.2"
+    },
+    {
+      "name": "network_end",
+      "value": "10.20.0.50"
+    }
+  ]
+}
 ```
 
 ## Build (**relevant for developers only**)
