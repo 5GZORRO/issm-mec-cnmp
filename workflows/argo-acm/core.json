@@ -1,5 +1,21 @@
 {
     "registry": "84.88.32.158:5000",
 
-    "cluster_core": "cluster-2"
+    "cluster_core": "cluster-2",
+    "networks": [
+        {
+            "name": "sbi",
+            "master": "ens3",
+            "range": "10.100.200.0/24",
+            "start": "10.100.200.2",
+            "end": "10.100.200.20"
+        },
+        {
+            "name": "ngap",
+            "master": "ens3",
+            "range": "192.168.1.0/24",
+            "start": "192.168.1.250",
+            "end": "192.168.1.250"
+        }
+    ]
 }

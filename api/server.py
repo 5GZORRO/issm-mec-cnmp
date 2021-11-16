@@ -1,4 +1,5 @@
 import flask
+import json
 import os
 import requests
 import sys
@@ -11,7 +12,6 @@ import kubernetes
 from kubernetes.client import V1Namespace
 from kubernetes.client import V1ObjectMeta
 from kubernetes.client.rest import ApiException
-import re
 
 
 registry_private_free5gc = os.getenv('REGISTRY_PRIVATE_FREE5GC')
@@ -182,6 +182,7 @@ def subnet():
         network_range = value.get('network_range', 'OVERRIDE')
         network_start = value.get('network_start', 'OVERRIDE')
         network_end = value.get('network_end', 'OVERRIDE')
+        networks = value.get('networks')
 
         with open('/fiveg-subnet.yaml') as f:
             fiveg_subnet_yaml = yaml.load(f, Loader=yaml.FullLoader)
@@ -194,7 +195,7 @@ def subnet():
             network_master=network_master,
             network_range=network_range,
             network_start=network_start,
-            network_end=network_end
+            network_end=network_end, networks=json.dumps(networks)
         )
         response = flask.jsonify(res_json)
         response.status_code = 200

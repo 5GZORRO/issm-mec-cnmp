@@ -11,5 +11,21 @@
     "network_master": "ens3",
     "network_range": "10.20.0.0/24",
     "network_start": "10.20.0.2",
-    "network_end": "10.20.0.50"
+    "network_end": "10.20.0.50",
+    "networks": [
+        {
+            "name": "sbi",
+            "master": "ens3",
+            "range": "10.100.200.0/24",
+            "start": "10.100.200.21",
+            "end": "10.100.200.40"
+        },
+        {
+            "name": "up",
+            "master": "ens3",
+            "range": "192.168.1.0/24",
+            "start": "192.168.1.251",
+            "end": "192.168.1.253"
+        }
+    ]
 }

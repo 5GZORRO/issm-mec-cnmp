@@ -5,5 +5,21 @@
     "cluster_edge": "cluster-1",
     "smf_name": "smf-sample",
     "sst": "1",
-    "sd": "010203"
+    "sd": "010203",
+    "networks": [
+        {
+            "name": "sbi",
+            "master": "ens3",
+            "range": "10.100.200.0/24",
+            "start": "10.100.200.21",
+            "end": "10.100.200.40"
+        },
+        {
+            "name": "up",
+            "master": "ens3",
+            "range": "192.168.1.0/24",
+            "start": "192.168.1.251",
+            "end": "192.168.1.253"
+        }
+    ]
 }
