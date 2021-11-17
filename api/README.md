@@ -8,7 +8,7 @@ Log into OCM cluster
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:cc3308e
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4659b79
 export NAMESPACE=5g-core
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
@@ -63,7 +63,17 @@ curl -X POST \
   "cluster_edge": "cluster-1",
   "smf_name": "smf-sample",
   "sst": "1",
-  "sd": "010203"
+  "sd": "010203",
+  "networks": [
+    {
+        "name": "sbi", "master": "ens3", "range": "10.100.200.0/24",
+        "start": "10.100.200.21", "end": "10.100.200.40"
+    },
+    {
+        "name": "up", "master": "ens3", "range": "192.168.1.0/24",
+        "start": "192.168.1.251", "end": "192.168.1.253"        
+    }
+  ]
 }'
 ```
 
@@ -78,16 +88,26 @@ curl -X POST \
   "cluster_edge": "cluster-1",
   "smf_name": "smf-sample",
   "sst": "1",
-  "sd": "010203",
+  "sd": "112233",
   "network_name": "gilan",
   "network_master": "ens3",
   "network_range": "10.20.0.0/24",
   "network_start": "10.20.0.2",
-  "network_end": "10.20.0.50"
+  "network_end": "10.20.0.50",
+  "networks": [
+    {
+        "name": "sbi", "master": "ens3", "range": "10.100.200.0/24",
+        "start": "10.100.200.21", "end": "10.100.200.40"
+    },
+    {
+        "name": "up", "master": "ens3", "range": "192.168.1.0/24",
+        "start": "192.168.1.251", "end": "192.168.1.253"        
+    }
+  ]
 }'
 
 {
-  "subnet_name": "fiveg-subnet-010203"
+  "subnet_name": "fiveg-subnet-112233"
 }
 
 
@@ -176,7 +196,7 @@ curl -X GET \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:cc3308e
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4659b79
     ```
 
 1.  Invoke the below command.

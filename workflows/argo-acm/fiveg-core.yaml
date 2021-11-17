@@ -10,6 +10,8 @@ spec:
     - name: registry
       value: "OVERRIDE"
 
+    - name: networks
+
     - name: cluster_core
       value: paris-core
 
@@ -50,20 +52,4 @@ spec:
 
               - name: networks
                 value: |
-                  [
-                    {
-                      "name": "sbi",
-                      "master": "ens3",
-                      "range": "10.100.200.0/24",
-                      "start": "10.100.200.2",
-                      "end": "10.100.200.20"
-                    },
-                    {
-                      "name": "ngap",
-                      "master": "ens3",
-                      "range": "192.168.1.0/24",
-                      "start": "192.168.1.250",
-                      "end": "192.168.1.250"
-                    }
-                  ]
-        
+                  {{workflow.parameters.networks}}
