@@ -13,7 +13,7 @@ Create two fresh **Ubuntu 20.04** VMs: 4 vCPU, 8 GB RAM, 50 GB for
 
 **Important**: ensure VMs network interfaces set with the same name e.g. `ens3`
 
-![Testbed](images/multi-cluster-zorro-1.png)
+![Testbed](images/multi-cluster-zorro-bluered.png)
 
 ## Open Cluster Manager
 
@@ -81,17 +81,42 @@ Do this for all three clusters: hub, core and edge clusters
 
 ### Apply argo roles
 
-Have Argo to run free5gc workflows under `5g-core` namespace.
+Have Argo to run free5gc workflows under `5g-core` , `blue`, `red`, namespaces.
 
 ```
-kubectl create namespace 5g-core
-kubectl apply -f workflows/argo/role.yaml
+export NAMESPACE=5g-core
+kubectl create namespace $NAMESPACE
+envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
 ```
+
+```
+export NAMESPACE=blue
+kubectl create namespace $NAMESPACE
+envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
+```
+
+```
+export NAMESPACE=red
+kubectl create namespace $NAMESPACE
+envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
+```
+
 
 ### Apply common argo templates
 
 ```
-kubectl apply -f  workflows/common-templates  -n 5g-core
+export NAMESPACE=5g-core
+kubectl apply -f  workflows/common-templates  -n $NAMESPACE
+```
+
+```
+export NAMESPACE=blue
+kubectl apply -f  workflows/common-templates  -n $NAMESPACE
+```
+
+```
+export NAMESPACE=red
+kubectl apply -f  workflows/common-templates  -n $NAMESPACE
 ```
 
 ## 5G Operator
@@ -312,10 +337,14 @@ New subscriber -> accept all defaults -> Submit
 
 Log into ACM hub cluster
 
-deploy subnet and wait for the flow to complete
+deploy subnet on the blue namespace
 
 ```
-argo -n 5g-core  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch
+kubectl create ns blue
+```
+
+```
+argo -n blue  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch
 ```
 
 wait for the flow to complete

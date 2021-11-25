@@ -39,6 +39,8 @@ spec:
     - name: network_end
       value: "OVERRIDE"
 
+    - name: core_namespace
+      value: 5g-core
 
   templates:
   - name: handlerequest
@@ -181,6 +183,8 @@ spec:
               value:
               - name: smf_name
                 value: {{workflow.parameters.smf_name}}
+              - name: core_namespace
+                value: {{workflow.parameters.core_namespace}}
               - name: upf_sbi
                 value: {{inputs.parameters.upf_sbi}}
               - name: upf_up
