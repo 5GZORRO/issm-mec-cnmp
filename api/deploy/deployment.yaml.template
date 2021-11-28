@@ -23,5 +23,3 @@ spec:
         env:
         - name: REGISTRY_PRIVATE_FREE5GC
           value: "$REGISTRY_PRIVATE_FREE5GC"
-        - name: NAMESPACE
-          value: "$NAMESPACE"

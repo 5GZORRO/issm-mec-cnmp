@@ -8,7 +8,7 @@ Log into OCM cluster
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4659b79
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:temp
 export NAMESPACE=5g-core
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
@@ -40,9 +40,11 @@ REST path:
 Data payload:
     cluster_core   - the cluster of where the core is deployed (str)
     cluster_edge   - the edge (cluster) of which the subnet will be deployed (str)
+    namespace      - the namespace under which the subnet will be deployed (str)
     sst            - the sst of the slice e.g. "1" (str)
     sd             - slice differentiator e.g. "010203" (str)
     smf_name       - the name of the SMF function instance to re-configure (str)
+    core_namespace - the namespace of the 5G core (str)
     network_name   - the name of the internal network to attach the slice with (str) Optional.
                      note: if provided, the below is required
 
@@ -61,7 +63,9 @@ curl -X POST \
   -d '{
   "cluster_core": "cluster-2",
   "cluster_edge": "cluster-1",
+  "namespace": "blue",
   "smf_name": "smf-sample",
+  "core_namespace": "5g-core",
   "sst": "1",
   "sd": "010203",
   "networks": [
@@ -86,7 +90,9 @@ curl -X POST \
   -d '{
   "cluster_core": "cluster-2",
   "cluster_edge": "cluster-1",
+  "namespace": "red",
   "smf_name": "smf-sample",
+  "core_namespace": "5g-core",
   "sst": "1",
   "sd": "112233",
   "network_name": "gilan",
@@ -118,10 +124,11 @@ curl -X POST \
 Retrieve the progress, status and parameters of a given subnet slice
 
 ```
-curl -X GET http://<ocm master ipaddress>:30055/subnetslice/<subnet_name>
+curl -X GET http://<ocm master ipaddress>:30055/subnetslice/<namespace>/<subnet_name>
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
+    namespace   - the namespace of the subnetslice
     subnet_name - the name of the subnetslice as being returned from the POST endpoint (str)
 ```
 
@@ -129,7 +136,7 @@ Example:
 
 ```bash
 curl -X GET \
-  http://192.168.1.117:30055/subnetslice/fiveg-subnet-010203
+  http://192.168.1.117:30055/subnetslice/blue/fiveg-subnet-010203
 
 {
   "name": "fiveg-subnet-010203",
@@ -196,7 +203,7 @@ curl -X GET \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4659b79
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:temp
     ```
 
 1.  Invoke the below command.
