@@ -58,6 +58,11 @@ curl -X POST \
       }
   ]
 }'
+
+{
+  "name": "fiveg-core"
+}
+
 ```
 
 
@@ -143,8 +148,6 @@ curl -X POST \
 {
   "subnet_name": "fiveg-subnet-112233"
 }
-
-
 ```
 
 ### Get core/slice
@@ -152,11 +155,11 @@ curl -X POST \
 Retrieve the progress, status and parameters of a given core/slice
 
 ```
-curl -X GET http://<ocm master ipaddress>:30055/core_subnetslice/<subnet_name>
+curl -X GET http://<ocm master ipaddress>:30055/core_subnetslice/<name>
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
-    subnet_name - the name of the subnetslice as being returned from the POST endpoint (str)
+    name - the name of the core/subnetslice as being returned from the POST endpoint (str)
 ```
 
 Example:
