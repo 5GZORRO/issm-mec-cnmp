@@ -8,7 +8,7 @@ Log into OCM cluster
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4659b79
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:temp
 export NAMESPACE=5g-core
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
@@ -26,6 +26,40 @@ curl http://<ocm master ipaddress>:30055/hello
 ```
 
 ## Service APIs
+
+### Create core
+
+Creates a core on a given (core) kubernetes cluster
+
+```
+curl -X POST -d '{"cluster_core": "<string>"' http://<ocm master ipaddress>:30055/core
+
+REST path:
+    ocm master ipaddress - ipaddress of OCM Hub.
+
+Data payload:
+    cluster_core   - the cluster of where the core is deployed (str)
+```
+
+Example:
+
+```bash
+curl -X POST \
+  http://192.168.1.117:30055/core \
+  -H 'content-type: application/json' \
+  -d '{
+  "cluster_core": "cluster-2",
+  "networks": [
+      {
+          "name": "sbi", "master": "ens3", "range": "10.100.200.0/24", "start": "10.100.200.2", "end": "10.100.200.20"
+      },
+      {
+          "name": "ngap", "master": "ens3", "range": "192.168.1.0/24", "start": "192.168.1.250", "end": "192.168.1.250"
+      }
+  ]
+}'
+```
+
 
 ### Create subnetslice
 
@@ -113,12 +147,12 @@ curl -X POST \
 
 ```
 
-### Get subnetslice
+### Get core/slice
 
-Retrieve the progress, status and parameters of a given subnet slice
+Retrieve the progress, status and parameters of a given core/slice
 
 ```
-curl -X GET http://<ocm master ipaddress>:30055/subnetslice/<subnet_name>
+curl -X GET http://<ocm master ipaddress>:30055/core_subnetslice/<subnet_name>
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
@@ -129,7 +163,7 @@ Example:
 
 ```bash
 curl -X GET \
-  http://192.168.1.117:30055/subnetslice/fiveg-subnet-010203
+  http://192.168.1.117:30055/core_subnetslice/fiveg-subnet-010203
 
 {
   "name": "fiveg-subnet-010203",
@@ -196,7 +230,7 @@ curl -X GET \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4659b79
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:temp
     ```
 
 1.  Invoke the below command.
