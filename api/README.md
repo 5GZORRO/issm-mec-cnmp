@@ -9,11 +9,12 @@ Log into OCM cluster
 ```
 export REGISTRY=docker.pkg.github.com
 export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:temp
-export NAMESPACE=5g-core
+export NAMESPACE=issm-mec-cnmp
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
 
 ```
+kubectl ns create $NAMESPACE
 kubectl apply -f deploy/role.yaml -n $NAMESPACE
 envsubst < deploy/deployment.yaml.template | kubectl create -n ${NAMESPACE} -f -
 kubectl create -f deploy/service.yaml -n $NAMESPACE

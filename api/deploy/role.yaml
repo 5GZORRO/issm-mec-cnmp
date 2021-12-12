@@ -19,11 +19,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: issm-mec-cnmp-api
-  namespace: 5g-core
+  namespace: issm-mec-cnmp
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: 5g-core
+  namespace: issm-mec-cnmp
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
