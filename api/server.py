@@ -76,7 +76,7 @@ class Proxy:
 
         sys.stdout.write('Done creating workflow\n')
         return {
-            'subnet_name': workflow_cr['metadata']['name']
+            'name': workflow_cr['metadata']['name']
             }
 
     def get_workflow(self, namespace, name):

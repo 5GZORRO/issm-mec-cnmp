@@ -28,6 +28,46 @@ curl http://<ocm master ipaddress>:30055/hello
 
 ## Service APIs
 
+### Create core
+
+Creates a core on a given (core) kubernetes cluster
+
+```
+curl -X POST -d '{"cluster_core": "<string>"}' http://<ocm master ipaddress>:30055/core
+
+REST path:
+    ocm master ipaddress - ipaddress of OCM Hub.
+
+Data payload:
+    cluster_core   - the cluster of where the core is deployed (str)
+    namespace      - the namespace under which the core will be deployed (str)
+```
+
+Example:
+
+```bash
+curl -X POST \
+  http://192.168.1.117:30055/core \
+  -H 'content-type: application/json' \
+  -d '{
+  "cluster_core": "cluster-2",
+  "namespace": "5g-core",
+  "networks": [
+      {
+          "name": "sbi", "master": "ens3", "range": "10.100.200.0/24", "start": "10.100.200.2", "end": "10.100.200.20"
+      },
+      {
+          "name": "ngap", "master": "ens3", "range": "192.168.1.0/24", "start": "192.168.1.250", "end": "192.168.1.250"
+      }
+  ]
+}'
+
+{
+  "name": "fiveg-core"
+}
+```
+
+
 ### Create subnetslice
 
 Creates a slice on a given (edge) kubernetes cluster
@@ -80,6 +120,10 @@ curl -X POST \
     }
   ]
 }'
+
+{
+  "name": "fiveg-subnet-010203"
+}
 ```
 
 Example 2: slice attached to a local datanetwork
@@ -114,30 +158,28 @@ curl -X POST \
 }'
 
 {
-  "subnet_name": "fiveg-subnet-112233"
+  "name": "fiveg-subnet-112233"
 }
-
-
 ```
 
-### Get subnetslice
+### Get core/slice
 
-Retrieve the progress, status and parameters of a given subnet slice
+Retrieve the progress, status and parameters of a given core/slice
 
 ```
-curl -X GET http://<ocm master ipaddress>:30055/subnetslice/<namespace>/<subnet_name>
+curl -X GET http://<ocm master ipaddress>:30055/core_subnetslice/<namespace>/<name>
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
     namespace   - the namespace of the subnetslice
-    subnet_name - the name of the subnetslice as being returned from the POST endpoint (str)
+    name - the name of the core/subnetslice as being returned from the POST endpoint (str)
 ```
 
 Example:
 
 ```bash
 curl -X GET \
-  http://192.168.1.117:30055/subnetslice/blue/fiveg-subnet-010203
+  http://192.168.1.117:30055/core_subnetslice/blue/fiveg-subnet-010203
 
 {
   "name": "fiveg-subnet-010203",
