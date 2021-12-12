@@ -35,14 +35,16 @@ def raise_for_status(r):
     return http_error_msg
 
 
-def core_workflow_template(workflow_cr, **kwargs):
+def core_workflow_template(workflow_cr, core_subnet, **kwargs):
     def _build_params(**dn):
         if dn is not None:
             return [dict(name=k, value=dn[k]) for k in dn]
         else:
             return None
-
-    workflow_cr['metadata']['name'] = 'fiveg-subnet-%s' % kwargs['sd']
+    if kwargs.get('sd'):
+        workflow_cr['metadata']['name'] = 'fiveg-%s-%s' % (core_subnet, kwargs['sd'])
+    else:
+        workflow_cr['metadata']['name'] = 'fiveg-%s' % core_subnet
     workflow_cr['spec']['arguments']['parameters'] = _build_params(**kwargs)
 
     return workflow_cr
@@ -58,9 +60,11 @@ class Proxy:
         self.core_api = kubernetes.client.CoreV1Api()
         sys.stdout.write('Proxy application initialized\n')
 
-    def create_workflow(self, workflow_cr, **kwargs):
+    def create_workflow(self, workflow_cr, core_subnet='subnet', **kwargs):
         del workflow_cr['spec']['arguments']['parameters']
-        workflow_cr = core_workflow_template(workflow_cr=workflow_cr, **kwargs)
+        workflow_cr = core_workflow_template(workflow_cr=workflow_cr,
+                                             core_subnet=core_subnet,
+                                             **kwargs)
 
         sys.stdout.write('[DEBUG] created skeleton: %s \n' % workflow_cr)
 
@@ -135,6 +139,60 @@ def hello():
     return ("Greetings from the Api server! ")
 
 
+@proxy.route("/core",  methods=['POST'])
+def core():
+    """
+    Create core.
+
+    :param registry: url to private image registry to be used for the deployment. Optional
+    :type registry: ``str``
+
+    :param namespace: the namespace of the core to create
+    :type namespace: ``str``
+
+    :param cluster_core: the cluster of where the core is to be deployed
+    :type cluster_core: ``str``
+
+    TODO: add network parameters..
+    """
+    sys.stdout.write('Received core request\n')
+    try:
+        value = getMessagePayload()
+
+        namespace = value.get('namespace')
+        registry = value.get('registry', registry_private_free5gc)
+        cluster_core = value['cluster_core']
+        networks = value.get('networks')
+
+        with open('/fiveg-core.yaml') as f:
+            _yaml = yaml.load(f, Loader=yaml.FullLoader)
+
+        res_json = proxy_server.create_workflow(
+            workflow_cr=_yaml, namespace=namespace, core_subnet='core',
+            registry=registry,
+            cluster_core=cluster_core, networks=json.dumps(networks)
+        )
+        response = flask.jsonify(res_json)
+        response.status_code = 200
+        return response
+
+    except HTTPException as e:
+        sys.stdout.write('Exit /core %s\n' % str(e))
+        return e
+
+    except ApiException as e:
+        response = flask.jsonify({'error': 'Reason: %s. Body: %s'
+                                  % (e.reason, e.body)})
+        response.status_code = e.status
+
+    except Exception as e:
+        response = flask.jsonify({'error': 'Internal error. {}'.format(e)})
+        response.status_code = 500
+
+    sys.stdout.write('Exit /core %s\n' % str(response))
+    return response
+
+
 @proxy.route("/subnetslice",  methods=['POST'])
 def subnet():
     """
@@ -143,7 +201,7 @@ def subnet():
     :param registry: url to private image registry to be used for the deployment. Optional
     :type registry: ``str``
 
-    :param namespace: the namespacec of the subnetslice to create
+    :param namespace: the namespace of the subnetslice to create
     :type namespace: ``str``
 
     :param cluster_core: the cluster of where the core is deployed
@@ -188,10 +246,10 @@ def subnet():
         networks = value.get('networks')
 
         with open('/fiveg-subnet.yaml') as f:
-            fiveg_subnet_yaml = yaml.load(f, Loader=yaml.FullLoader)
+            _yaml = yaml.load(f, Loader=yaml.FullLoader)
 
         res_json = proxy_server.create_workflow(
-            workflow_cr=fiveg_subnet_yaml, namespace=namespace,
+            workflow_cr=_yaml, namespace=namespace,
             registry=registry,
             cluster_core=cluster_core, cluster_edge=cluster_edge,
             smf_name=smf_name, core_namespace=core_namespace, sst=sst, sd=sd,
@@ -222,8 +280,8 @@ def subnet():
     return response
 
 
-@proxy.route("/subnetslice/<namespace>/<name>",  methods=['GET'])
-def get_subnetslice(namespace, name):
+@proxy.route("/core_subnetslice/<namespace>/<name>",  methods=['GET'])
+def get_core_subnetslice(namespace, name):
     """
     Get a subnet slice.
 

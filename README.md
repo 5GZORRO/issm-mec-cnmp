@@ -81,22 +81,21 @@ Do this for all three clusters: hub, core and edge clusters
 
 ### Apply argo roles
 
-Have Argo to run free5gc workflows under `5g-core` , `blue`, `red`, namespaces.
+Have Argo to run free5gc workflows under `domain-operator-a` , `domain-operator-b`, `domain-operator-c`, namespaces.
 
 ```
-export NAMESPACE=5g-core
+# operator-a
+export NAMESPACE=domain-operator-a
 kubectl create namespace $NAMESPACE
 envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
-```
 
-```
-export NAMESPACE=blue
+# operator-b
+export NAMESPACE=domain-operator-b
 kubectl create namespace $NAMESPACE
 envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
-```
 
-```
-export NAMESPACE=red
+# operator-c
+export NAMESPACE=domain-operator-c
 kubectl create namespace $NAMESPACE
 envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
 ```
@@ -105,17 +104,16 @@ envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
 ### Apply common argo templates
 
 ```
-export NAMESPACE=5g-core
+# operator-a
+export NAMESPACE=domain-operator-a
 kubectl apply -f  workflows/common-templates  -n $NAMESPACE
-```
 
-```
-export NAMESPACE=blue
+# operator-b
+export NAMESPACE=domain-operator-b
 kubectl apply -f  workflows/common-templates  -n $NAMESPACE
-```
 
-```
-export NAMESPACE=red
+# operator-c
+export NAMESPACE=domain-operator-c
 kubectl apply -f  workflows/common-templates  -n $NAMESPACE
 ```
 
@@ -273,7 +271,7 @@ Log into ACM hub cluster
 
 ```
 cd ~/issm-mec-cnmp
-argo -n 5g-core  submit workflows/argo-acm/fiveg-core.yaml --parameter-file workflows/argo-acm/core.json --watch
+argo -n domain-operator-a submit workflows/argo-acm/fiveg-core.yaml --parameter-file workflows/argo-acm/core.json --watch
 ```
 
 wait for the flow to complete
@@ -344,7 +342,7 @@ kubectl create ns blue
 ```
 
 ```
-argo -n blue  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch
+argo -n domain-operator-b  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch
 ```
 
 wait for the flow to complete

@@ -14,7 +14,7 @@ export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
 
 ```
-kubectl ns create $NAMESPACE
+kubectl create ns $NAMESPACE
 kubectl apply -f deploy/role.yaml -n $NAMESPACE
 envsubst < deploy/deployment.yaml.template | kubectl create -n ${NAMESPACE} -f -
 kubectl create -f deploy/service.yaml -n $NAMESPACE
@@ -51,7 +51,7 @@ curl -X POST \
   -H 'content-type: application/json' \
   -d '{
   "cluster_core": "cluster-2",
-  "namespace": "5g-core",
+  "namespace": "domain-operator-a",
   "networks": [
       {
           "name": "sbi", "master": "ens3", "range": "10.100.200.0/24", "start": "10.100.200.2", "end": "10.100.200.20"
@@ -104,9 +104,9 @@ curl -X POST \
   -d '{
   "cluster_core": "cluster-2",
   "cluster_edge": "cluster-1",
-  "namespace": "blue",
+  "namespace": "domain-operator-b",
   "smf_name": "smf-sample",
-  "core_namespace": "5g-core",
+  "core_namespace": "domain-operator-a",
   "sst": "1",
   "sd": "010203",
   "networks": [
@@ -135,9 +135,9 @@ curl -X POST \
   -d '{
   "cluster_core": "cluster-2",
   "cluster_edge": "cluster-1",
-  "namespace": "red",
+  "namespace": "domain-operator-c",
   "smf_name": "smf-sample",
-  "core_namespace": "5g-core",
+  "core_namespace": "domain-operator-a",
   "sst": "1",
   "sd": "112233",
   "network_name": "gilan",
@@ -179,7 +179,7 @@ Example:
 
 ```bash
 curl -X GET \
-  http://192.168.1.117:30055/core_subnetslice/blue/fiveg-subnet-010203
+  http://192.168.1.117:30055/core_subnetslice/domain-operator-b/fiveg-subnet-010203
 
 {
   "name": "fiveg-subnet-010203",
