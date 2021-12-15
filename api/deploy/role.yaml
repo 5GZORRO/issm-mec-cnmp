@@ -1,8 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   name: issm-mec-cnmp-api
-  namespace: 5g-core
 rules:
 - apiGroups:
   - "argoproj.io"
@@ -17,19 +16,15 @@ rules:
   - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: issm-mec-cnmp-api
-  namespace: 5g-core
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: issm-mec-cnmp-api
+  namespace: issm-mec-cnmp
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: 5g-core
-- kind: Group
-  name: system:serviceaccounts:default
+  namespace: issm-mec-cnmp
+roleRef:
   apiGroup: rbac.authorization.k8s.io
-  namespace: 5g-core
+  kind: ClusterRole
+  name: issm-mec-cnmp-api

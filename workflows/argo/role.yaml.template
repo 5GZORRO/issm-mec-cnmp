@@ -1,8 +1,8 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: 5g-core-argo
-  namespace: 5g-core
+  name: "$NAMESPACE-argo"
+  namespace: "$NAMESPACE"
 rules:
 - apiGroups:
   - ""
@@ -104,17 +104,17 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: 5g-core-argo
-  namespace: 5g-core
+  name: "$NAMESPACE-argo"
+  namespace: "$NAMESPACE"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: 5g-core-argo
+  name: "$NAMESPACE-argo"
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: 5g-core
+  namespace: "$NAMESPACE"
 - kind: Group
   name: system:serviceaccounts:default
   apiGroup: rbac.authorization.k8s.io
-  namespace: 5g-core
+  namespace: "$NAMESPACE"

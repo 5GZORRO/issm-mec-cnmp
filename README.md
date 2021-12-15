@@ -13,7 +13,7 @@ Create two fresh **Ubuntu 20.04** VMs: 4 vCPU, 8 GB RAM, 50 GB for
 
 **Important**: ensure VMs network interfaces set with the same name e.g. `ens3`
 
-![Testbed](images/multi-cluster-zorro-1.png)
+![Testbed](images/multi-cluster-zorro-bluered.png)
 
 ## Open Cluster Manager
 
@@ -81,17 +81,40 @@ Do this for all three clusters: hub, core and edge clusters
 
 ### Apply argo roles
 
-Have Argo to run free5gc workflows under `5g-core` namespace.
+Have Argo to run free5gc workflows under `domain-operator-a` , `domain-operator-b`, `domain-operator-c`, namespaces.
 
 ```
-kubectl create namespace 5g-core
-kubectl apply -f workflows/argo/role.yaml
+# operator-a
+export NAMESPACE=domain-operator-a
+kubectl create namespace $NAMESPACE
+envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
+
+# operator-b
+export NAMESPACE=domain-operator-b
+kubectl create namespace $NAMESPACE
+envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
+
+# operator-c
+export NAMESPACE=domain-operator-c
+kubectl create namespace $NAMESPACE
+envsubst < workflows/argo/role.yaml.template | kubectl apply -n $NAMESPACE -f -
 ```
+
 
 ### Apply common argo templates
 
 ```
-kubectl apply -f  workflows/common-templates  -n 5g-core
+# operator-a
+export NAMESPACE=domain-operator-a
+kubectl apply -f  workflows/common-templates  -n $NAMESPACE
+
+# operator-b
+export NAMESPACE=domain-operator-b
+kubectl apply -f  workflows/common-templates  -n $NAMESPACE
+
+# operator-c
+export NAMESPACE=domain-operator-c
+kubectl apply -f  workflows/common-templates  -n $NAMESPACE
 ```
 
 ## 5G Operator
@@ -248,7 +271,7 @@ Log into ACM hub cluster
 
 ```
 cd ~/issm-mec-cnmp
-argo -n 5g-core  submit workflows/argo-acm/fiveg-core.yaml --parameter-file workflows/argo-acm/core.json --watch
+argo -n domain-operator-a submit workflows/argo-acm/fiveg-core.yaml --parameter-file workflows/argo-acm/core.json --watch
 ```
 
 wait for the flow to complete
@@ -312,10 +335,14 @@ New subscriber -> accept all defaults -> Submit
 
 Log into ACM hub cluster
 
-deploy subnet and wait for the flow to complete
+deploy subnet on the blue namespace
 
 ```
-argo -n 5g-core  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch
+kubectl create ns blue
+```
+
+```
+argo -n domain-operator-b  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch
 ```
 
 wait for the flow to complete

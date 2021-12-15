@@ -8,12 +8,13 @@ Log into OCM cluster
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:035ded2
-export NAMESPACE=5g-core
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4742a5d
+export NAMESPACE=issm-mec-cnmp
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
 
 ```
+kubectl create ns $NAMESPACE
 kubectl apply -f deploy/role.yaml -n $NAMESPACE
 envsubst < deploy/deployment.yaml.template | kubectl create -n ${NAMESPACE} -f -
 kubectl create -f deploy/service.yaml -n $NAMESPACE
@@ -32,13 +33,14 @@ curl http://<ocm master ipaddress>:30055/hello
 Creates a core on a given (core) kubernetes cluster
 
 ```
-curl -X POST -d '{"cluster_core": "<string>"' http://<ocm master ipaddress>:30055/core
+curl -X POST -d '{"cluster_core": "<string>"}' http://<ocm master ipaddress>:30055/core
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
 
 Data payload:
     cluster_core   - the cluster of where the core is deployed (str)
+    namespace      - the namespace under which the core will be deployed (str)
 ```
 
 Example:
@@ -49,6 +51,7 @@ curl -X POST \
   -H 'content-type: application/json' \
   -d '{
   "cluster_core": "cluster-2",
+  "namespace": "domain-operator-a",
   "networks": [
       {
           "name": "sbi", "master": "ens3", "range": "10.100.200.0/24", "start": "10.100.200.2", "end": "10.100.200.20"
@@ -62,7 +65,6 @@ curl -X POST \
 {
   "name": "fiveg-core"
 }
-
 ```
 
 
@@ -79,9 +81,11 @@ REST path:
 Data payload:
     cluster_core   - the cluster of where the core is deployed (str)
     cluster_edge   - the edge (cluster) of which the subnet will be deployed (str)
+    namespace      - the namespace under which the subnet will be deployed (str)
     sst            - the sst of the slice e.g. "1" (str)
     sd             - slice differentiator e.g. "010203" (str)
     smf_name       - the name of the SMF function instance to re-configure (str)
+    core_namespace - the namespace of the 5G core (str)
     network_name   - the name of the internal network to attach the slice with (str) Optional.
                      note: if provided, the below is required
 
@@ -100,7 +104,9 @@ curl -X POST \
   -d '{
   "cluster_core": "cluster-2",
   "cluster_edge": "cluster-1",
+  "namespace": "domain-operator-b",
   "smf_name": "smf-sample",
+  "core_namespace": "domain-operator-a",
   "sst": "1",
   "sd": "010203",
   "networks": [
@@ -114,6 +120,10 @@ curl -X POST \
     }
   ]
 }'
+
+{
+  "name": "fiveg-subnet-010203"
+}
 ```
 
 Example 2: slice attached to a local datanetwork
@@ -125,7 +135,9 @@ curl -X POST \
   -d '{
   "cluster_core": "cluster-2",
   "cluster_edge": "cluster-1",
+  "namespace": "domain-operator-c",
   "smf_name": "smf-sample",
+  "core_namespace": "domain-operator-a",
   "sst": "1",
   "sd": "112233",
   "network_name": "gilan",
@@ -146,7 +158,7 @@ curl -X POST \
 }'
 
 {
-  "subnet_name": "fiveg-subnet-112233"
+  "name": "fiveg-subnet-112233"
 }
 ```
 
@@ -155,10 +167,11 @@ curl -X POST \
 Retrieve the progress, status and parameters of a given core/slice
 
 ```
-curl -X GET http://<ocm master ipaddress>:30055/core_subnetslice/<name>
+curl -X GET http://<ocm master ipaddress>:30055/core_subnetslice/<namespace>/<name>
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
+    namespace   - the namespace of the subnetslice
     name - the name of the core/subnetslice as being returned from the POST endpoint (str)
 ```
 
@@ -166,7 +179,7 @@ Example:
 
 ```bash
 curl -X GET \
-  http://192.168.1.117:30055/core_subnetslice/fiveg-subnet-010203
+  http://192.168.1.117:30055/core_subnetslice/domain-operator-b/fiveg-subnet-010203
 
 {
   "name": "fiveg-subnet-010203",
@@ -233,7 +246,7 @@ curl -X GET \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:035ded2
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4742a5d
     ```
 
 1.  Invoke the below command.

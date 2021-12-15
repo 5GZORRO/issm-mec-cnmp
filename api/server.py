@@ -17,9 +17,6 @@ from kubernetes.client.rest import ApiException
 registry_private_free5gc = os.getenv('REGISTRY_PRIVATE_FREE5GC')
 print ('**registry_private_free5gc: %s**' % registry_private_free5gc)
 
-namespace = os.getenv('NAMESPACE')
-print ('**namespace: %s**' % namespace)
-
 
 def find(l, predicate):
     results = [x for x in l if predicate(x)]
@@ -74,23 +71,21 @@ class Proxy:
         sys.stdout.write('[INFO] about to submit workflow %s ...\n'
                          % workflow_cr)
 
-        global namespace
         self.api.create_namespaced_custom_object(
             group='argoproj.io',
             version='v1alpha1',
-            namespace=namespace,
+            namespace=kwargs['namespace'],
             plural='workflows',
             body=workflow_cr)
 
         sys.stdout.write('Done creating workflow\n')
         return {
             'name': workflow_cr['metadata']['name']
-        }
+            }
 
-    def get_workflow(self, name):
+    def get_workflow(self, namespace, name):
         sys.stdout.write('Requesting workflow for name '+name+'\n')
 
-        global namespace
         workflow = self.api.get_namespaced_custom_object(
             group="argoproj.io",
             version="v1alpha1",
@@ -152,6 +147,9 @@ def core():
     :param registry: url to private image registry to be used for the deployment. Optional
     :type registry: ``str``
 
+    :param namespace: the namespace of the core to create
+    :type namespace: ``str``
+
     :param cluster_core: the cluster of where the core is to be deployed
     :type cluster_core: ``str``
 
@@ -161,6 +159,7 @@ def core():
     try:
         value = getMessagePayload()
 
+        namespace = value.get('namespace')
         registry = value.get('registry', registry_private_free5gc)
         cluster_core = value['cluster_core']
         networks = value.get('networks')
@@ -169,7 +168,7 @@ def core():
             _yaml = yaml.load(f, Loader=yaml.FullLoader)
 
         res_json = proxy_server.create_workflow(
-            workflow_cr=_yaml, core_subnet='core',
+            workflow_cr=_yaml, namespace=namespace, core_subnet='core',
             registry=registry,
             cluster_core=cluster_core, networks=json.dumps(networks)
         )
@@ -202,6 +201,9 @@ def subnet():
     :param registry: url to private image registry to be used for the deployment. Optional
     :type registry: ``str``
 
+    :param namespace: the namespace of the subnetslice to create
+    :type namespace: ``str``
+
     :param cluster_core: the cluster of where the core is deployed
     :type cluster_core: ``str``
 
@@ -210,6 +212,9 @@ def subnet():
 
     :param smf_name: the name of the SMF function instance to re-configure
     :type smf_name: ``str``
+
+    :param core_namespace: the namespace of the core deployment
+    :type core_namespace: ``str``
 
     :param sst: the sst of the slice e.g. "1"
     :type sst: ``str``
@@ -223,11 +228,13 @@ def subnet():
     try:
         value = getMessagePayload()
 
+        namespace = value.get('namespace')
         registry = value.get('registry', registry_private_free5gc)
         cluster_core = value['cluster_core']
         cluster_edge = value['cluster_edge']
 
         smf_name = value.get('smf_name', "smf-sample")
+        core_namespace = value.get('core_namespace', "5g-core")
         sst = value.get('sst', "1")
         sd = value['sd']
 
@@ -242,9 +249,10 @@ def subnet():
             _yaml = yaml.load(f, Loader=yaml.FullLoader)
 
         res_json = proxy_server.create_workflow(
-            workflow_cr=_yaml, registry=registry,
+            workflow_cr=_yaml, namespace=namespace,
+            registry=registry,
             cluster_core=cluster_core, cluster_edge=cluster_edge,
-            smf_name=smf_name, sst=sst, sd=sd,
+            smf_name=smf_name, core_namespace=core_namespace, sst=sst, sd=sd,
             network_name=network_name,
             network_master=network_master,
             network_range=network_range,
@@ -272,10 +280,19 @@ def subnet():
     return response
 
 
-@proxy.route("/core_subnetslice/<name>",  methods=['GET'])
-def get_core_subnetslice(name):
+@proxy.route("/core_subnetslice/<namespace>/<name>",  methods=['GET'])
+def get_core_subnetslice(namespace, name):
+    """
+    Get a subnet slice.
+
+    :param namespace: the namespace of the subnetslice to retrieve
+    :type namespace: ``str``
+
+    :param name: the name of the subnetslice to create
+    :type name: ``str``
+    """
     try:
-        flow_json = proxy_server.get_workflow(name)
+        flow_json = proxy_server.get_workflow(namespace, name)
         response = flask.jsonify(flow_json)
         response.status_code = 200
         return response

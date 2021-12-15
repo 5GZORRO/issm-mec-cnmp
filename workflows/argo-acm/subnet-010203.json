@@ -4,6 +4,7 @@
     "cluster_core": "cluster-2",
     "cluster_edge": "cluster-1",
     "smf_name": "smf-sample",
+    "core_namespace": "domain-operator-a",
     "sst": "1",
     "sd": "010203",
     "networks": [

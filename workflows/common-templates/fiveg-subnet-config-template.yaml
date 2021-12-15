@@ -28,7 +28,7 @@ spec:
               {
                 "config": {
                   "resourceType": "smfs.v1alpha1.5g.ibm.com",
-                  "resourceNamespace": "{{workflow.namespace}}",
+                  "resourceNamespace": "{{workflow.parameters.core_namespace}}",
                   "resourceName": "{{workflow.parameters.smf_name}}",
                   "transition": "AttachNode",
                   "properties": {
@@ -63,7 +63,7 @@ spec:
               {
                 "config": {
                   "resourceType": "smfs.v1alpha1.5g.ibm.com",
-                  "resourceNamespace": "{{workflow.namespace}}",
+                  "resourceNamespace": "{{workflow.parameters.core_namespace}}",
                   "resourceName": "{{workflow.parameters.smf_name}}",
                   "transition": "AddLink",
                   "properties": {
