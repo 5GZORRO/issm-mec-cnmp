@@ -178,6 +178,7 @@ Log into host installed with docker and has access to docker.pkg.github.com
 cd ~
 git clone https://github.com/free5gc/free5gc-compose.git
 cd free5gc-compose
+git checkout tags/v2021-02-20-01
 make base
 docker-compose build
 ```
