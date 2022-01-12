@@ -390,3 +390,7 @@ Open another terminal on UE VM and perform the below to transfer data over this 
 ```
 curl --interface uesimtun0 google.com
 ```
+
+## Licensing
+
+This 5GZORRO component is published under Apache 2.0 license. Please see the [LICENSE](./LICENSE) file for further details.
