@@ -17,7 +17,7 @@ Init container is being defined by the 5G NFs controller in a similar pattern as
 ```
   initContainers:
     - name: amf-init
-      image: artifactory.haifa.ibm.com:5130/weit/5ginitcontainer
+      image: docker.pkg.github.com/5gzorro/issm-mec-cnmp/5ginitcontainer
       volumeMounts:
         - name: podinfo
           mountPath: /etc/podinfo
@@ -36,8 +36,7 @@ Init container is being defined by the 5G NFs controller in a similar pattern as
 
 ## Build
 
-1.  Set the `REGISTRY` environment variable to hold the name of your docker registry. The following command sets it
-    equal to the Haifa repository.
+1.  Set the `REGISTRY` environment variable to hold the name of your docker registry.
 
     ```
     $ export REGISTRY=docker.pkg.github.com
