@@ -48,3 +48,29 @@ kubectl get pod -n 5g
 
 * before using 'make', load your profile: `source ~/.profile`
 * to un-install the operator: `make undeploy`
+
+## Build (**relevant for developers only**)
+
+1. Edit Makefile with `VERSION ?= temp` so that the resulted image tag does not collide with the existing one.
+
+1. Edit Makefile with `IMAGE_TAG_BASE` with the proper image registry. Note: current version uses an internal registry to hold the operator and 5G network function images.
+
+1. Build and push the image.
+
+    ```
+    make generate
+    ```
+    
+    ```
+    make manifests
+    ```
+    
+    ```
+    make docker-build docker-push
+    ```
+
+1. Deploy the operator
+
+   ```
+   make deploy
+   ```
