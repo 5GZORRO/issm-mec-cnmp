@@ -53,6 +53,9 @@ spec:
 
     - name: core_namespace
       value: 5g-core
+        
+    - name: elicensing
+      value: "OVERRIDE"
 
   templates:
   - name: handlerequest
@@ -164,6 +167,8 @@ spec:
                 value: "{{workflow.parameters.network_start}}"
               - name: network_end
                 value: "{{workflow.parameters.network_end}}"
+              - name: elicensing
+                value: {{workflow.parameters.elicensing}}
 
   - name: create-subnet-configure-subscription
     inputs:

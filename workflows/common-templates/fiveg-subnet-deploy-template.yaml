@@ -94,7 +94,8 @@ spec:
                       "dnn_name": "internet",
                       apn_cidr: "10.10.0.0/16"                    
                     }
-                  ]
+                  ],
+                  "elicensing": "{{workflow.parameters.elicensing}}"
                 }
               }
 
@@ -129,7 +130,8 @@ spec:
                       "dnn_name": "internet",
                       apn_cidr: "10.10.0.0/16"                    
                     }
-                  ]
+                  ],
+                  "elicensing": "{{workflow.parameters.elicensing}}"
                 }
               }
 

@@ -22,5 +22,10 @@
             "start": "192.168.1.251",
             "end": "192.168.1.253"
         }
-    ]
+    ],
+    "licensing": {
+        "image": "ghcr.io/5gzorro/elicensing-manager-agent/elma_sidecar:gitlab-ci",
+        "elma_ip": "http://192.168.137.118:31880",
+        "product_offering_id": "id-po-upf-k8s"
+    }
 }
