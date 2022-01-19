@@ -167,7 +167,14 @@ def core():
     :param cluster_core: the cluster of where the core is to be deployed
     :type cluster_core: ``str``
 
-    TODO: add network parameters..
+    :param networks: list of networks to create and used by the core network functions
+            each entry includes the following attributes:
+                "name": network name
+                "master": the interface on the host to bound
+                "range": range in cidr format
+                "start": first ip in the range
+                "end": last ip in the range
+    :type networks: ``list`` of ``dict``
     """
     sys.stdout.write('Received core request\n')
     try:
@@ -236,7 +243,14 @@ def subnet():
     :param sd: slice differentiator e.g. "010203"
     :type sd: ``str``
 
-    TODO: add network parameters..
+    :param networks: list of networks to create and used by the slice functions
+            each entry includes the following attributes:
+                "name": network name
+                "master": the interface on the host to bound
+                "range": range in cidr format
+                "start": first ip in the range
+                "end": last ip in the range
+    :type networks: ``list`` of ``dict``
     """
     sys.stdout.write('Received subnetslice request\n')
     try:
