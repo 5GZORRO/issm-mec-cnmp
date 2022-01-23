@@ -55,10 +55,10 @@ def core_workflow_template(workflow_cr, core_subnet, **kwargs):
             return [dict(name=k, value=dn[k]) for k in dn]
         else:
             return None
-    if kwargs.get('sd'):
-        workflow_cr['metadata']['name'] = 'fiveg-%s-%s' % (core_subnet, kwargs['sd'])
-    else:
-        workflow_cr['metadata']['name'] = 'fiveg-%s' % core_subnet
+#    if kwargs.get('sd'):
+#        workflow_cr['metadata']['name'] = 'fiveg-%s-%s' % (core_subnet, kwargs['sd'])
+#    else:
+#        workflow_cr['metadata']['name'] = 'fiveg-%s' % core_subnet
     workflow_cr['spec']['arguments']['parameters'] = _build_params(**kwargs)
 
     return workflow_cr
@@ -85,16 +85,16 @@ class Proxy:
         sys.stdout.write('[INFO] about to submit workflow %s ...\n'
                          % workflow_cr)
 
-        self.api.create_namespaced_custom_object(
+        data = self.api.create_namespaced_custom_object(
             group='argoproj.io',
             version='v1alpha1',
             namespace=kwargs['namespace'],
             plural='workflows',
             body=workflow_cr)
 
-        sys.stdout.write('Done creating workflow\n')
+        sys.stdout.write('Done creating workflow. data=[%s]\n' % data)
         return {
-            'name': workflow_cr['metadata']['name']
+            'name': data['metadata']['name']
             }
 
     def get_workflow(self, namespace, name):

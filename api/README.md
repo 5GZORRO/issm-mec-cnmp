@@ -63,7 +63,7 @@ curl -X POST \
 }'
 
 {
-  "name": "fiveg-core"
+  "name": "fiveg-core-pgq4v"
 }
 ```
 
@@ -122,7 +122,7 @@ curl -X POST \
 }'
 
 {
-  "name": "fiveg-subnet-010203"
+  "name": "fiveg-subnet-j7dlm"
 }
 ```
 
@@ -158,7 +158,7 @@ curl -X POST \
 }'
 
 {
-  "name": "fiveg-subnet-112233"
+  "name": "fiveg-subnet-7s9nc"
 }
 ```
 
@@ -179,10 +179,10 @@ Example:
 
 ```bash
 curl -X GET \
-  http://192.168.1.117:30055/core_subnetslice/domain-operator-b/fiveg-subnet-010203
+  http://192.168.1.117:30055/core_subnetslice/domain-operator-b/fiveg-subnet-j7dlm
 
 {
-  "name": "fiveg-subnet-010203",
+  "name": "fiveg-subnet-j7dlm",
   "phase": "Running",
   "progress": "1/2",
   "workflow_parameters": [

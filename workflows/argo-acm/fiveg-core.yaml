@@ -17,7 +17,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  name: fiveg-core-acm
+  generateName: fiveg-core-
 spec:
   entrypoint: handlerequest
   arguments:
