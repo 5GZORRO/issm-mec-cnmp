@@ -182,7 +182,7 @@ def core():
 
         namespace = value.get('namespace')
         registry = value.get('registry', registry_private_free5gc)
-        cluster_core = value['cluster_core']
+        cluster= value['cluster']
         networks = value.get('networks')
 
         with open('/fiveg-core.yaml') as f:
@@ -191,7 +191,7 @@ def core():
         res_json = proxy_server.create_workflow(
             workflow_cr=_yaml, namespace=namespace, core_subnet='core',
             registry=registry,
-            cluster_core=cluster_core, networks=json.dumps(networks)
+            cluster=cluster, networks=json.dumps(networks)
         )
         response = flask.jsonify(res_json)
         response.status_code = 200
@@ -225,11 +225,11 @@ def subnet():
     :param namespace: the namespace of the subnetslice to create
     :type namespace: ``str``
 
+    :param cluster: the (edge) cluster of which the subnet will be deployed
+    :type cluster: ``str``
+
     :param cluster_core: the cluster of where the core is deployed
     :type cluster_core: ``str``
-
-    :param cluster_edge: the edge (cluster) of which the subnet will be deployed
-    :type cluster_edge: ``str``
 
     :param smf_name: the name of the SMF function instance to re-configure
     :type smf_name: ``str``
@@ -259,7 +259,7 @@ def subnet():
         namespace = value.get('namespace')
         registry = value.get('registry', registry_private_free5gc)
         cluster_core = value['cluster_core']
-        cluster_edge = value['cluster_edge']
+        cluster = value['cluster']
 
         smf_name = value.get('smf_name', "smf-sample")
         core_namespace = value.get('core_namespace', "5g-core")
@@ -279,7 +279,7 @@ def subnet():
         res_json = proxy_server.create_workflow(
             workflow_cr=_yaml, namespace=namespace,
             registry=registry,
-            cluster_core=cluster_core, cluster_edge=cluster_edge,
+            cluster_core=cluster_core, cluster=cluster,
             smf_name=smf_name, core_namespace=core_namespace, sst=sst, sd=sd,
             network_name=network_name,
             network_master=network_master,

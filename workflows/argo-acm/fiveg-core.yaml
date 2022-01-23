@@ -1,4 +1,4 @@
-# Copyright 2021 – 2022 IBM Corporation
+# Copyright 2021 - 2022 IBM Corporation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ spec:
 
     - name: networks
 
-    - name: cluster_core
-      value: paris-core
+    - name: cluster
+      value: "OVERRIDE"
 
   templates:
   - name: handlerequest
@@ -54,7 +54,7 @@ spec:
           channel: gitops-chn-ns/gitops
           placement:
             clusters:
-            - name: {{workflow.parameters.cluster_core}}
+            - name: {{workflow.parameters.cluster}}
           packageOverrides:
           - packageName: fiveg-core
             packageOverrides:
