@@ -8,7 +8,7 @@ Log into OCM cluster
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:parameters
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:93be254
 export NAMESPACE=issm-mec-cnmp
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
@@ -246,7 +246,7 @@ curl -X GET \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:parameters
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:93be254
     ```
 
 1.  Invoke the below command.
