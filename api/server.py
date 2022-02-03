@@ -55,10 +55,10 @@ def core_workflow_template(workflow_cr, core_subnet, **kwargs):
             return [dict(name=k, value=dn[k]) for k in dn]
         else:
             return None
-    if kwargs.get('sd'):
-        workflow_cr['metadata']['name'] = 'fiveg-%s-%s' % (core_subnet, kwargs['sd'])
-    else:
-        workflow_cr['metadata']['name'] = 'fiveg-%s' % core_subnet
+#    if kwargs.get('sd'):
+#        workflow_cr['metadata']['name'] = 'fiveg-%s-%s' % (core_subnet, kwargs['sd'])
+#    else:
+#        workflow_cr['metadata']['name'] = 'fiveg-%s' % core_subnet
     workflow_cr['spec']['arguments']['parameters'] = _build_params(**kwargs)
 
     return workflow_cr
@@ -85,16 +85,16 @@ class Proxy:
         sys.stdout.write('[INFO] about to submit workflow %s ...\n'
                          % workflow_cr)
 
-        self.api.create_namespaced_custom_object(
+        data = self.api.create_namespaced_custom_object(
             group='argoproj.io',
             version='v1alpha1',
             namespace=kwargs['namespace'],
             plural='workflows',
             body=workflow_cr)
 
-        sys.stdout.write('Done creating workflow\n')
+        sys.stdout.write('Done creating workflow. data=[%s]\n' % data)
         return {
-            'name': workflow_cr['metadata']['name']
+            'name': data['metadata']['name']
             }
 
     def get_workflow(self, namespace, name):
@@ -167,7 +167,14 @@ def core():
     :param cluster_core: the cluster of where the core is to be deployed
     :type cluster_core: ``str``
 
-    TODO: add network parameters..
+    :param networks: list of networks to create and used by the core network functions
+            each entry includes the following attributes:
+                "name": network name
+                "master": the interface on the host to bound
+                "range": range in cidr format
+                "start": first ip in the range
+                "end": last ip in the range
+    :type networks: ``list`` of ``dict``
     """
     sys.stdout.write('Received core request\n')
     try:
@@ -175,7 +182,7 @@ def core():
 
         namespace = value.get('namespace')
         registry = value.get('registry', registry_private_free5gc)
-        cluster_core = value['cluster_core']
+        cluster= value['cluster']
         networks = value.get('networks')
 
         with open('/fiveg-core.yaml') as f:
@@ -184,7 +191,7 @@ def core():
         res_json = proxy_server.create_workflow(
             workflow_cr=_yaml, namespace=namespace, core_subnet='core',
             registry=registry,
-            cluster_core=cluster_core, networks=json.dumps(networks)
+            cluster=cluster, networks=json.dumps(networks)
         )
         response = flask.jsonify(res_json)
         response.status_code = 200
@@ -218,11 +225,11 @@ def subnet():
     :param namespace: the namespace of the subnetslice to create
     :type namespace: ``str``
 
+    :param cluster: the (edge) cluster of which the subnet will be deployed
+    :type cluster: ``str``
+
     :param cluster_core: the cluster of where the core is deployed
     :type cluster_core: ``str``
-
-    :param cluster_edge: the edge (cluster) of which the subnet will be deployed
-    :type cluster_edge: ``str``
 
     :param smf_name: the name of the SMF function instance to re-configure
     :type smf_name: ``str``
@@ -236,7 +243,14 @@ def subnet():
     :param sd: slice differentiator e.g. "010203"
     :type sd: ``str``
 
-    TODO: add network parameters..
+    :param networks: list of networks to create and used by the slice functions
+            each entry includes the following attributes:
+                "name": network name
+                "master": the interface on the host to bound
+                "range": range in cidr format
+                "start": first ip in the range
+                "end": last ip in the range
+    :type networks: ``list`` of ``dict``
     """
     sys.stdout.write('Received subnetslice request\n')
     try:
@@ -245,7 +259,7 @@ def subnet():
         namespace = value.get('namespace')
         registry = value.get('registry', registry_private_free5gc)
         cluster_core = value['cluster_core']
-        cluster_edge = value['cluster_edge']
+        cluster = value['cluster']
 
         smf_name = value.get('smf_name', "smf-sample")
         core_namespace = value.get('core_namespace', "5g-core")
@@ -265,7 +279,7 @@ def subnet():
         res_json = proxy_server.create_workflow(
             workflow_cr=_yaml, namespace=namespace,
             registry=registry,
-            cluster_core=cluster_core, cluster_edge=cluster_edge,
+            cluster_core=cluster_core, cluster=cluster,
             smf_name=smf_name, core_namespace=core_namespace, sst=sst, sd=sd,
             network_name=network_name,
             network_master=network_master,

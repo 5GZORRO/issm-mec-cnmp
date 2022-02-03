@@ -1,4 +1,4 @@
-# Copyright 2021 – 2022 IBM Corporation
+# Copyright 2021 - 2022 IBM Corporation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ spec:
     - name: registry
       value: "OVERRIDE"
 
+    - name: cluster
+
     - name: cluster_core
-      value: "OVERRIDE"
-    - name: cluster_edge
       value: "OVERRIDE"
 
     - name: smf_name
@@ -79,9 +79,9 @@ spec:
         arguments:
           parameters:
           - name: subscription_name
-            value: 5g-subnet-deploy-{{workflow.parameters.sd}}
+            value: "deploy-{{workflow.name}}"
           - name: cluster_name
-            value: "{{workflow.parameters.cluster_edge}}"
+            value: "{{workflow.parameters.cluster}}"
           - name: namespace
             value: "{{workflow.namespace}}"
           - name: channel_name
@@ -100,9 +100,9 @@ spec:
         arguments:
           parameters:
           - name: subscription_name
-            value: 5g-subnet-deploy-{{workflow.parameters.sd}}
+            value: "deploy-{{workflow.name}}"
           - name: cluster_name
-            value: "{{workflow.parameters.cluster_edge}}"
+            value: "{{workflow.parameters.cluster}}"
           - name: namespace
             value: "{{workflow.namespace}}"
           - name: channel_name
@@ -135,17 +135,17 @@ spec:
           annotations:
             apps.open-cluster-management.io/github-branch: multi-cluster-1
             apps.open-cluster-management.io/github-path: subnet-deploy-wf
-          name: 5g-subnet-deploy-{{workflow.parameters.sd}}
+          name: deploy-{{workflow.name}}
         spec:
           channel: gitops-chn-ns/gitops
           placement:
             clusters:
-            - name: {{workflow.parameters.cluster_edge}}
+            - name: {{workflow.parameters.cluster}}
           packageOverrides:
           - packageName: fiveg-subnet-deploy
             packageOverrides:
             - path: metadata.name
-              value: 5g-subnet-deploy-{{workflow.parameters.sd}}
+              value: deploy-{{workflow.name}}
             - path: spec.arguments.parameters
               value:
               - name: registry
@@ -185,7 +185,7 @@ spec:
           annotations:
             apps.open-cluster-management.io/github-branch: multi-cluster-1
             apps.open-cluster-management.io/github-path: subnet-configure-wf
-          name: 5g-subnet-configure-{{workflow.parameters.sd}}
+          name: configure-{{workflow.name}}
         spec:
           channel: gitops-chn-ns/gitops
           placement:
@@ -195,7 +195,7 @@ spec:
           - packageName: fiveg-subnet-configure
             packageOverrides:
             - path: metadata.name
-              value: 5g-subnet-configure-{{workflow.parameters.sd}}
+              value: configure-{{workflow.name}}
             - path: spec.arguments.parameters
               value:
               - name: smf_name

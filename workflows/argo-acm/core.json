@@ -1,7 +1,7 @@
 {
     "registry": "84.88.32.158:5000",
 
-    "cluster_core": "cluster-2",
+    "cluster": "cluster-2",
     "networks": [
         {
             "name": "sbi",

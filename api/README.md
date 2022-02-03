@@ -8,7 +8,7 @@ Log into OCM cluster
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4742a5d
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:93be254
 export NAMESPACE=issm-mec-cnmp
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
@@ -39,7 +39,7 @@ REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
 
 Data payload:
-    cluster_core   - the cluster of where the core is deployed (str)
+    cluster        - the cluster of where the core is deployed (str)
     namespace      - the namespace under which the core will be deployed (str)
 ```
 
@@ -50,7 +50,7 @@ curl -X POST \
   http://192.168.1.117:30055/core \
   -H 'content-type: application/json' \
   -d '{
-  "cluster_core": "cluster-2",
+  "cluster": "cluster-2",
   "namespace": "domain-operator-a",
   "networks": [
       {
@@ -63,7 +63,7 @@ curl -X POST \
 }'
 
 {
-  "name": "fiveg-core"
+  "name": "fiveg-core-pgq4v"
 }
 ```
 
@@ -79,8 +79,8 @@ REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
 
 Data payload:
+    cluster        - the (edge) cluster of which the subnet will be deployed (str)
     cluster_core   - the cluster of where the core is deployed (str)
-    cluster_edge   - the edge (cluster) of which the subnet will be deployed (str)
     namespace      - the namespace under which the subnet will be deployed (str)
     sst            - the sst of the slice e.g. "1" (str)
     sd             - slice differentiator e.g. "010203" (str)
@@ -102,8 +102,8 @@ curl -X POST \
   http://192.168.1.117:30055/subnetslice \
   -H 'content-type: application/json' \
   -d '{
+  "cluster": "cluster-1",
   "cluster_core": "cluster-2",
-  "cluster_edge": "cluster-1",
   "namespace": "domain-operator-b",
   "smf_name": "smf-sample",
   "core_namespace": "domain-operator-a",
@@ -122,7 +122,7 @@ curl -X POST \
 }'
 
 {
-  "name": "fiveg-subnet-010203"
+  "name": "fiveg-subnet-j7dlm"
 }
 ```
 
@@ -133,8 +133,8 @@ curl -X POST \
   http://192.168.1.117:30055/subnetslice \
   -H 'content-type: application/json' \
   -d '{
+  "cluster": "cluster-1",
   "cluster_core": "cluster-2",
-  "cluster_edge": "cluster-1",
   "namespace": "domain-operator-c",
   "smf_name": "smf-sample",
   "core_namespace": "domain-operator-a",
@@ -158,7 +158,7 @@ curl -X POST \
 }'
 
 {
-  "name": "fiveg-subnet-112233"
+  "name": "fiveg-subnet-7s9nc"
 }
 ```
 
@@ -179,10 +179,10 @@ Example:
 
 ```bash
 curl -X GET \
-  http://192.168.1.117:30055/core_subnetslice/domain-operator-b/fiveg-subnet-010203
+  http://192.168.1.117:30055/core_subnetslice/domain-operator-b/fiveg-subnet-j7dlm
 
 {
-  "name": "fiveg-subnet-010203",
+  "name": "fiveg-subnet-j7dlm",
   "phase": "Running",
   "progress": "1/2",
   "workflow_parameters": [
@@ -195,7 +195,7 @@ curl -X GET \
       "value": "cluster-2"
     },
     {
-      "name": "cluster_edge",
+      "name": "cluster",
       "value": "cluster-1"
     },
     {
@@ -246,7 +246,7 @@ curl -X GET \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:4742a5d
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:93be254
     ```
 
 1.  Invoke the below command.
