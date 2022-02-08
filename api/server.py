@@ -272,6 +272,8 @@ def subnet():
         network_start = value.get('network_start', 'OVERRIDE')
         network_end = value.get('network_end', 'OVERRIDE')
         networks = value.get('networks')
+        product_id = value.get('product_id')
+        elma_url = value.get('elma_url')
 
         with open('/fiveg-subnet.yaml') as f:
             _yaml = yaml.load(f, Loader=yaml.FullLoader)
@@ -285,7 +287,8 @@ def subnet():
             network_master=network_master,
             network_range=network_range,
             network_start=network_start,
-            network_end=network_end, networks=json.dumps(networks)
+            network_end=network_end, networks=json.dumps(networks),
+            product_id=product_id, elma_url=elma_url
         )
         response = flask.jsonify(res_json)
         response.status_code = 200

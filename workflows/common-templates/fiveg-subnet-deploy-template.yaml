@@ -1,4 +1,4 @@
-# Copyright 2021 – 2022 IBM Corporation
+# Copyright 2021 - 2022 IBM Corporation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -95,7 +95,12 @@ spec:
                       apn_cidr: "10.10.0.0/16"                    
                     }
                   ],
-                  "elicensing": {{workflow.parameters.elicensing}}
+                  "elicensing": {
+                    "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
+                    "elma_ip": "{{workflow.parameters.elma_url}}",
+                    "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "is_active": true
+                  }
                 }
               }
 
@@ -131,7 +136,12 @@ spec:
                       apn_cidr: "10.10.0.0/16"                    
                     }
                   ],
-                  "elicensing": {{workflow.parameters.elicensing}}
+                  "elicensing": {
+                    "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
+                    "elma_ip": "{{workflow.parameters.elma_url}}",
+                    "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "is_active": true
+                  }
                 }
               }
 
