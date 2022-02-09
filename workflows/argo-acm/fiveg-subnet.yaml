@@ -64,23 +64,7 @@ spec:
   - name: handlerequest
     dag:
       tasks:
-      - name: license-check
-        template: license-check
-        arguments:
-          parameters:
-          - name: product_id
-            value: "{{workflow.parameters.product_id}}"
-          - name: elma_url
-            value: "{{workflow.parameters.elma_url}}"
-
-      - name: license-check-fail
-        dependencies: [license-check]
-        template: fail
-        when: "{{tasks.license-check.outputs.parameters.status}} != 200"
-
       - name: create-subnet-deploy-subscription
-        dependencies: [license-check]
-        when: "{{tasks.license-check.outputs.parameters.status}} == 200"
         template: create-subnet-deploy-subscription
 
       - name: wait-for-subnet-status
@@ -231,36 +215,6 @@ spec:
               - name: sd
                 value: "{{workflow.parameters.sd}}"
 
-  - name: license-check
-    inputs:
-      parameters:
-      - name: product_id
-      - name: elma_url
-    script:
-      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
-      imagePullPolicy: IfNotPresent
-      command: [python]
-      source: |
-        import json
-        import requests
-        import sys
-
-        headers = {'Content-Type': 'application/json'}
-        r = requests.post("{{inputs.parameters.elma_url}}/checkLicensing",
-            json={"productId": "{{inputs.parameters.product_id}}",
-            "nsDescriptorId": "this-is-a-test", "nsInstanceId": ""},
-            headers=headers)
-        print (str(r))
-        with open('/tmp/status.txt', 'w') as f:
-            f.write(str(r.status_code))
-        
-    outputs:
-      parameters:
-      - name: status
-        valueFrom:
-          path: /tmp/status.txt
-
-  
   - name: delay-seconds
     inputs:
       parameters:
@@ -288,10 +242,3 @@ spec:
       source: |
         kubectl get subscriptions.apps.open-cluster-management.io {{inputs.parameters.subscription_name}} -o json | jq '.status.statuses."{{inputs.parameters.cluster_name}}".packages."{{inputs.parameters.channel_name}}-{{inputs.parameters.cr_name}}-{{inputs.parameters.package_name}}".resourceStatus.outputs.parameters[0].value' | jq -r . | jq -r '.[] | select(.name=="{{inputs.parameters.namespace}}/{{inputs.parameters.network_name}}") | .ips[0]'
 
-  - name: fail
-    script:
-      image: debian:9.4
-      imagePullPolicy: IfNotPresent
-      command: [bash]
-      source: |
-        exit 123
