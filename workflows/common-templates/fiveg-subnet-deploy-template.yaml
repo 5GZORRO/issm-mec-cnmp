@@ -193,7 +193,7 @@ spec:
         headers = {'Content-Type': 'application/json'}
         r = requests.post("{{inputs.parameters.elma_url}}/checkLicensing",
             json={"productId": "{{inputs.parameters.product_id}}",
-            "nsDescriptorId": "{{inputs.parameters.upf_name}}", "nsInstanceId": ""},
+            "nsDescriptorId": "free5gc-upf", "nsInstanceId": ""},
             headers=headers)
         print (str(r))
         with open('/tmp/status.txt', 'w') as f:
