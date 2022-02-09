@@ -30,8 +30,10 @@ spec:
       value: "OVERRIDE"
 
     - name: product_id
+      value: "OVERRIDE"
     # issm-wfm sets this with stakeholder's elma
     - name: elma_url
+      value: "OVERRIDE"
 
     - name: smf_name
       value: "OVERRIDE"
@@ -62,15 +64,23 @@ spec:
   - name: handlerequest
     dag:
       tasks:
-#      - name: check_licensing
-#        template: check_licensing
-#        arguments:
-#          parameters:
-#          - name: elicensing
-#            value: {{workflow.parameters.elicensing}}
+      - name: license-check
+        template: license-check
+        arguments:
+          parameters:
+          - name: product_id
+            value: "{{workflow.parameters.product_id}}"
+          - name: elma_url
+            value: "{{workflow.parameters.elma_url}}"
+
+      - name: license-check-fail
+        dependencies: [license-check]
+        template: fail
+        when: "{{tasks.license-check.outputs.parameters.status}} != 200"
 
       - name: create-subnet-deploy-subscription
-        # TODO: wait on status
+        dependencies: [license-check]
+        when: "{{tasks.license-check.outputs.parameters.status}} == 200"
         template: create-subnet-deploy-subscription
 
       - name: wait-for-subnet-status
@@ -221,33 +231,34 @@ spec:
               - name: sd
                 value: "{{workflow.parameters.sd}}"
 
-#  - name: check_licensing
-#    inputs:
-#      parameters:
-#      - name: elicensing
-#    script:
-#      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
-#      imagePullPolicy: IfNotPresent
-#      command: [python]
-#      source: |
-#        import json
-#        import requests
-#        import sys
-#
-#        headers = {'Content-Type': 'application/json'}
-#
-#        r = requests.get("http://{{inputs.parameters.service_ip}}:32000/discoveroffer/vnf"
-#            "_lat43_long10_" + str(price) + "_CDN",
-#            headers=headers)
-#
-#        # best ranked offer *always* at the first entry
-#        best_offer = r.json()[0]
-#
-#        # TODO: remove this once these attributes are inside the 'SW bundled' offer
-#        best_offer['Blueprint_name'] = 'vCDN_edge_ICOM'
-#        best_offer['serviceLevelAgreement']['id'] = 'RErjUVHVKqw1bu8WHPjxCU'
-#        best_offer['productSpecification']['relatedParty'][0]['name'] = 'operator_a'
-#        json.dump([best_offer], sys.stdout)
+  - name: license-check
+    inputs:
+      parameters:
+      - name: product_id
+      - name: elma_url
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        headers = {'Content-Type': 'application/json'}
+        r = requests.post("{{inputs.parameters.elma_url}}/checkLicensing",
+            json={"productId": "{{inputs.parameters.product_id}}",
+            "nsDescriptorId": "this-is-a-test", "nsInstanceId": ""},
+            headers=headers)
+        print (str(r))
+        with open('/tmp/status.txt', 'w') as f:
+            f.write(str(r.status_code))
+        
+    outputs:
+      parameters:
+      - name: status
+        valueFrom:
+          path: /tmp/status.txt
 
   
   - name: delay-seconds
@@ -276,3 +287,11 @@ spec:
       command: [sh]
       source: |
         kubectl get subscriptions.apps.open-cluster-management.io {{inputs.parameters.subscription_name}} -o json | jq '.status.statuses."{{inputs.parameters.cluster_name}}".packages."{{inputs.parameters.channel_name}}-{{inputs.parameters.cr_name}}-{{inputs.parameters.package_name}}".resourceStatus.outputs.parameters[0].value' | jq -r . | jq -r '.[] | select(.name=="{{inputs.parameters.namespace}}/{{inputs.parameters.network_name}}") | .ips[0]'
+
+  - name: fail
+    script:
+      image: debian:9.4
+      imagePullPolicy: IfNotPresent
+      command: [bash]
+      source: |
+        exit 123
