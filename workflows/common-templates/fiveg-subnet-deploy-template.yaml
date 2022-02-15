@@ -42,9 +42,15 @@ spec:
         template: fail
         when: "{{tasks.license-check.outputs.parameters.status}} != 200"
 
-      - name: create-networks
+      - name: license-check-succeed
         dependencies: [license-check]
+        template: license-check-succeed
         when: "{{tasks.license-check.outputs.parameters.status}} == 200"
+
+  - name: license-check-succeed
+    dag:
+      tasks:
+      - name: create-networks
         templateRef:
           name: network-template
           template: create-network
@@ -63,6 +69,7 @@ spec:
         withParam: "{{workflow.parameters.networks}}"
 
       - name: create-datanetwork
+        dependencies: [create-networks]
         when: "{{workflow.parameters.network_name}} != \"OVERRIDE\""
         templateRef:
           name: network-template
@@ -118,12 +125,14 @@ spec:
                     "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
                     "elma_ip": "{{workflow.parameters.elma_url}}",
                     "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "descriptor_id": "fiveg-subnet",
                     "is_active": true
                   }
                 }
               }
 
       - name: create-upf
+        dependencies: [create-networks]
         when: "{{workflow.parameters.network_name}} == \"OVERRIDE\""
         templateRef:
           name: nf-template
@@ -159,6 +168,7 @@ spec:
                     "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
                     "elma_ip": "{{workflow.parameters.elma_url}}",
                     "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "descriptor_id": "fiveg-subnet",
                     "is_active": true
                   }
                 }
@@ -193,7 +203,7 @@ spec:
         headers = {'Content-Type': 'application/json'}
         r = requests.post("{{inputs.parameters.elma_url}}/checkLicensing",
             json={"productId": "{{inputs.parameters.product_id}}",
-            "nsDescriptorId": "free5gc-upf", "nsInstanceId": ""},
+            "nsDescriptorId": "fiveg-subnet", "nsInstanceId": ""},
             headers=headers)
         print (str(r))
         with open('/tmp/status.txt', 'w') as f:
