@@ -25,31 +25,6 @@ spec:
   - name: handlerequest
     dag:
       tasks:
-      - name: license-check
-        template: license-check
-        arguments:
-          parameters:
-          - name: product_id
-            value: "{{workflow.parameters.product_id}}"
-          - name: elma_url
-            value: "{{workflow.parameters.elma_url}}"
-          - name: upf_name
-            # should be identical to the one set in the CR
-            value: "upf-{{workflow.name}}"
-
-      - name: license-check-fail
-        dependencies: [license-check]
-        template: fail
-        when: "{{tasks.license-check.outputs.parameters.status}} != 200"
-
-      - name: license-check-succeed
-        dependencies: [license-check]
-        template: license-check-succeed
-        when: "{{tasks.license-check.outputs.parameters.status}} == 200"
-
-  - name: license-check-succeed
-    dag:
-      tasks:
       - name: create-networks
         templateRef:
           name: network-template
@@ -190,7 +165,6 @@ spec:
       parameters:
       - name: product_id
       - name: elma_url
-      - name: upf_name
     script:
       image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
       imagePullPolicy: IfNotPresent
