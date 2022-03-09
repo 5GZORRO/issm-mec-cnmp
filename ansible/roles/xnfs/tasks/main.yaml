@@ -1,0 +1,41 @@
+- name: set list
+  set_fact:
+    images:
+      # ensure to use proper 5goperator tag
+      - weit/free5gc-upf-tools
+      - weit/free5gc-webui
+      - weit/free5gc-udr
+      - weit/free5gc-udm
+      - weit/free5gc-smf
+      - weit/free5gc-pcf
+      - weit/free5gc-nssf
+      - weit/free5gc-ausf
+      - weit/free5gc-amf
+      - weit/free5gc-nrf
+      - weit/mongo
+      - weit/5ginitcontainer
+      - weit/5goperator:e647d91
+      - argoproj/argoexec:v2.12.0-rc2
+
+    origin: "docker.pkg.github.com"
+    target: "172.15.0.167:5000"
+
+- name: pull docker images from origin registry
+  command: "docker pull {{ origin }}/{{ item }}"
+  loop: "{{ images }}"
+
+- name: tag docker images for private registry
+  command: "docker tag {{ origin }}/{{ item }} {{ target }}/{{ item }}"
+  loop: "{{ images }}"
+
+- name: push docker images to private registry
+  command: "docker push {{ target }}/{{ item }}"
+  loop: "{{ images }}"
+
+- name: remove docker images from localhost (private)
+  command: "docker rmi {{ target }}/{{ item }}"
+  loop: "{{ images }}"
+
+- name: remove docker images from localhost (origin)
+  command: "docker rmi {{ origin }}/{{ item }}"
+  loop: "{{ images }}"

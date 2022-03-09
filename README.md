@@ -212,6 +212,14 @@ docker build --tag docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf-tools
 then push it with `docker push ...`
 
 
+### Private registry
+
+This MEC setup uses private image registry to store free5gc and other helper images. This is to avoid the reconfiguration of
+service accounts and rbac roles as well as hitting docker pull requests limit
+
+Refer [here](./docs/registry.md) for setting the private registry
+
+
 ## UERANSIM
 
 https://github.com/aligungr/UERANSIM.git
