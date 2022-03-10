@@ -86,7 +86,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nrf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nrf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "nrf_name": "nrf-sample",
                   "mnc": "93",
@@ -115,7 +115,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udr",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udr:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "udr_name": "udr-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -143,7 +143,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udm",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udm:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "udm_name": "udm-sample",
                   "nrf_ip_address": "nrf-sample-sbi"
@@ -169,7 +169,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-ausf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-ausf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "ausf_name": "ausf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -196,7 +196,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nssf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nssf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "nssf_name": "nssf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -225,7 +225,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-amf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-amf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "amf_name": "amf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -254,7 +254,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-pcf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-pcf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "pcf_name": "pcf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -282,7 +282,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "smf_name": "smf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -314,7 +314,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-webui",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-webui:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "mongo_ip_address": "mongo-sample-sbi"
                   }

@@ -146,8 +146,8 @@ sudo apt install net-tools
 
 ```
 cd ~
-git clone https://github.com/PrinzOwO/gtp5g && cd gtp5g
-git checkout tags/v0.3.2
+git clone https://github.com/free5gc/gtp5g.git && cd gtp5g
+git checkout tags/v0.4.1
 make clean && make
 sudo make install
 ```
@@ -170,7 +170,7 @@ Refer [here](./5ginitcontainer) for more details
 
 Log into host installed with docker and has access to docker.pkg.github.com
 
-**Note:** ensure to build images out from free5gc `v3.0.5`
+**Note:** ensure to build images out from free5gc `v3.0.6`
 
 ### Build
 
@@ -178,7 +178,7 @@ Log into host installed with docker and has access to docker.pkg.github.com
 cd ~
 git clone https://github.com/free5gc/free5gc-compose.git
 cd free5gc-compose
-git checkout tags/v2021-02-20-01
+git checkout e0d4742b806d673bd035b48506e0c41eb1188a58
 make base
 docker-compose build
 ```
@@ -190,15 +190,16 @@ docker-compose build
 Ensure to properly tag the images built from the previous step - into the below names
 
 ```
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udr
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nssf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-amf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nrf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udr:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nssf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-amf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nrf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-webui:v3.0.6
 ```
 
 then push them with `docker push ...`
@@ -206,7 +207,7 @@ then push them with `docker push ...`
 ### Install additional tools into UPF
 
 ```
-docker build --tag docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf-tools --force-rm=true -f ./Dockerfile.upf .
+docker build --tag docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf-tools:v3.0.6 --force-rm=true -f ./Dockerfile.upf .
 ```
 
 then push it with `docker push ...`
@@ -234,7 +235,7 @@ Do this for both gNB and UE VMs
 cd ~
 git clone https://github.com/aligungr/UERANSIM.git
 cd UERANSIM
-git checkout tags/v3.2.0 -b v3.2.0-branch
+git checkout tags/v3.2.5 -b v3.2.5-branch
 ```
 
 ### Install UERANSIM

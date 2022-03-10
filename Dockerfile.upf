@@ -1,0 +1,4 @@
+FROM docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf:v3.0.6
+
+RUN apt-get update \
+    && apt install -y net-tools iputils-ping tcpdump iptables

@@ -81,7 +81,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "upf_name": "upf-{{workflow.name}}",
                   "data_network_name": "{{workflow.parameters.network_name}}",
@@ -117,7 +117,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "upf_name": "upf-{{workflow.name}}",
                   "dnns": [
