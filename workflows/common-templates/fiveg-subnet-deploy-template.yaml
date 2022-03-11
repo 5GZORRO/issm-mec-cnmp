@@ -1,4 +1,4 @@
-# Copyright 2021 – 2022 IBM Corporation
+# Copyright 2021 - 2022 IBM Corporation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,8 +43,30 @@ spec:
             value: "{{item.end}}"
         withParam: "{{workflow.parameters.networks}}"
 
-      - name: create-datanetwork
+      - name: create-datanetwork-and-upf
         when: "{{workflow.parameters.network_name}} != \"OVERRIDE\""
+        template: create-datanetwork-and-upf
+
+      - name: create-no-datanetwork-and-upf
+        when: "{{workflow.parameters.network_name}} == \"OVERRIDE\""
+        template: create-no-datanetwork-and-upf
+
+      - name: read-upf-pod
+        # a pod with same name is created for Upf CR
+        dependencies: [create-no-datanetwork-and-upf, create-datanetwork-and-upf]
+        templateRef:
+          name: nf-template
+          template: read-pod
+        arguments:
+          parameters:
+          - name: pod_name
+            value: upf-{{workflow.name}}
+
+
+  - name: create-datanetwork-and-upf
+    dag:
+      tasks:
+      - name: create-datanetwork
         templateRef:
           name: network-template
           template: create-network
@@ -61,9 +83,9 @@ spec:
           - name: end
             value: "{{workflow.parameters.network_end}}"
 
-      - name: create-upf-on-datanetwork
+      - name: create-upf-on-datanetwork-pool
+        when: "\"{{workflow.parameters.pool}}\" != \"0.0.0.0/16\""
         dependencies: [create-datanetwork]
-        when: "{{workflow.parameters.network_name}} != \"OVERRIDE\""
         templateRef:
           name: nf-template
           template: create-nf
@@ -88,18 +110,45 @@ spec:
                   "dnns": [
                     {
                       "dnn_name": "internet",
-                      apn_cidr: "60.60.0.0/16"
-                    },
-                    {
-                      "dnn_name": "internet",
-                      apn_cidr: "10.10.0.0/16"                    
+                      apn_cidr: "{{workflow.parameters.pool}}"
                     }
                   ]
                 }
               }
 
-      - name: create-upf
-        when: "{{workflow.parameters.network_name}} == \"OVERRIDE\""
+      - name: create-upf-on-datanetwork
+        when: "\"{{workflow.parameters.pool}}\" == \"0.0.0.0/16\""
+        dependencies: [create-datanetwork]
+        templateRef:
+          name: nf-template
+          template: create-nf
+        arguments:
+          parameters:
+          - name: nf_apiversion
+            value: "5g.ibm.com/v1alpha1"
+          - name: nf_kind
+            value: Upf
+          - name: nf_name
+            value: "upf-{{workflow.name}}"
+          - name: success_condition
+            value: "status.outputs.podname == upf-{{workflow.name}}"
+          - name: nf_spec
+            value: |
+              {
+                "config": {
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
+                  "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
+                  "upf_name": "upf-{{workflow.name}}",
+                  "data_network_name": "{{workflow.parameters.network_name}}"
+                }
+              }
+
+
+  - name: create-no-datanetwork-and-upf
+    dag:
+      tasks:
+      - name: create-upf-pool
+        when: "\"{{workflow.parameters.pool}}\" != \"0.0.0.0/16\""
         templateRef:
           name: nf-template
           template: create-nf
@@ -123,23 +172,33 @@ spec:
                   "dnns": [
                     {
                       "dnn_name": "internet",
-                      apn_cidr: "60.60.0.0/16"
-                    },
-                    {
-                      "dnn_name": "internet",
-                      apn_cidr: "10.10.0.0/16"                    
+                      apn_cidr: "{{workflow.parameters.pool}}"
                     }
                   ]
                 }
               }
 
-      - name: read-upf-pod
-        # a pod with same name is created for Upf CR
-        dependencies: [create-upf, create-upf-on-datanetwork]
+      - name: create-upf
+        when: "\"{{workflow.parameters.pool}}\" == \"0.0.0.0/16\""
         templateRef:
           name: nf-template
-          template: read-pod
+          template: create-nf
         arguments:
           parameters:
-          - name: pod_name
-            value: upf-{{workflow.name}}
+          - name: nf_apiversion
+            value: "5g.ibm.com/v1alpha1"
+          - name: nf_kind
+            value: Upf
+          - name: nf_name
+            value: "upf-{{workflow.name}}"
+          - name: success_condition
+            value: "status.outputs.podname == upf-{{workflow.name}}"            
+          - name: nf_spec
+            value: |
+              {
+                "config": {
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
+                  "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
+                  "upf_name": "upf-{{workflow.name}}"
+                }
+              }

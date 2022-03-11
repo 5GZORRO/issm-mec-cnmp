@@ -37,6 +37,9 @@ spec:
     - name: sd
       value: "OVERRIDE"
 
+    - name: pool
+      value: "0.0.0.0/16"
+
     - name: networks
 
     - name: network_name
@@ -165,6 +168,9 @@ spec:
               - name: network_end
                 value: "{{workflow.parameters.network_end}}"
 
+              - name: pool
+                value: "{{workflow.parameters.pool}}"
+
   - name: create-subnet-configure-subscription
     inputs:
       parameters:
@@ -205,6 +211,9 @@ spec:
                 value: "{{workflow.parameters.sst}}"
               - name: sd
                 value: "{{workflow.parameters.sd}}"
+
+              - name: pool
+                value: "{{workflow.parameters.pool}}"
 
   - name: delay-seconds
     inputs:
