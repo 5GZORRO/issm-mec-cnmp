@@ -8,6 +8,9 @@
     "sst": "1",
     "sd": "010203",
     "pool": "60.61.0.0/16",
+    "connectedFrom": "gNB",
+    "group": "blue",
+
     "networks": [
         {
             "name": "sbi",
