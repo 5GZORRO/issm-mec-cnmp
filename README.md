@@ -170,16 +170,31 @@ Refer [here](./5ginitcontainer) for more details
 
 Log into host installed with docker and has access to docker.pkg.github.com
 
-**Note:** ensure to build images out from free5gc `v3.0.6`
+**Note:** ensure to build images out from free5gc `v3.0.6` and the dynamic-load version of smf
 
 ### Build
 
 ```
+# Clone free5gc-compose project
 cd ~
-git clone https://github.com/free5gc/free5gc-compose.git
+git clone git@github.ibm.com:WEIT/free5gc-compose.git
 cd free5gc-compose
-git checkout e0d4742b806d673bd035b48506e0c41eb1188a58
-make base
+git checkout e0d4742-dynamic_load
+
+# clone free5gc v3.0.6
+cd base
+git clone --recursive -b v3.0.6 -j `nproc` https://github.com/free5gc/free5gc.git
+
+# replace smf with dynamic-load version
+cd free5gc/NFs
+rm -Rf smf
+git clone git@github.ibm.com:WEIT/smf.git
+cd smf
+git checkout dynamic_load
+
+# Build the images
+cd ~/free5gc-compose
+make all
 docker-compose build
 ```
 
@@ -192,7 +207,8 @@ Ensure to properly tag the images built from the previous step - into the below 
 ```
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udr:v3.0.6
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:v3.0.6-dynamic-load
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf-ext:v3.0.6-dynamic-load
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf:v3.0.6
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nssf:v3.0.6
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf:v3.0.6
