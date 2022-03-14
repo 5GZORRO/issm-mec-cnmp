@@ -1,4 +1,4 @@
-# Copyright 2021 – 2022 IBM Corporation
+# Copyright 2021 - 2022 IBM Corporation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -282,7 +282,8 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf:v3.0.6-dynamic-load",
+                  "image_ext": "{{workflow.parameters.registry}}/weit/free5gc-smf-ext:v3.0.6-dynamic-load",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "smf_name": "smf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
