@@ -243,6 +243,9 @@ def subnet():
     :param sd: slice differentiator e.g. "010203"
     :type sd: ``str``
 
+    :param pool: subnet for this upf in cidr format e.g. "60.61.0.0/16" (Optional)
+    :type pool: ``str``
+
     :param networks: list of networks to create and used by the slice functions
             each entry includes the following attributes:
                 "name": network name
@@ -266,6 +269,7 @@ def subnet():
         sst = value.get('sst', "1")
         sd = value['sd']
 
+        pool = value.get('pool', '0.0.0.0/16')
         network_name = value.get('network_name', 'OVERRIDE')
         network_master = value.get('network_master', 'OVERRIDE')
         network_range = value.get('network_range', 'OVERRIDE')
@@ -281,6 +285,7 @@ def subnet():
             registry=registry,
             cluster_core=cluster_core, cluster=cluster,
             smf_name=smf_name, core_namespace=core_namespace, sst=sst, sd=sd,
+            pool=pool,
             network_name=network_name,
             network_master=network_master,
             network_range=network_range,

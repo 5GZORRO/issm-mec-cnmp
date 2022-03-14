@@ -8,7 +8,7 @@ Log into OCM cluster
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:93be254
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:temp
 export NAMESPACE=issm-mec-cnmp
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
@@ -84,6 +84,7 @@ Data payload:
     namespace      - the namespace under which the subnet will be deployed (str)
     sst            - the sst of the slice e.g. "1" (str)
     sd             - slice differentiator e.g. "010203" (str)
+    pool           - subnet for this upf in cidr format e.g. "60.61.0.0/16" (str) Optional.
     smf_name       - the name of the SMF function instance to re-configure (str)
     core_namespace - the namespace of the 5G core (str)
     network_name   - the name of the internal network to attach the slice with (str) Optional.
@@ -109,6 +110,7 @@ curl -X POST \
   "core_namespace": "domain-operator-a",
   "sst": "1",
   "sd": "010203",
+  "pool": "60.62.0.0/16",
   "networks": [
     {
         "name": "sbi", "master": "ens3", "range": "10.100.200.0/24",
@@ -140,6 +142,7 @@ curl -X POST \
   "core_namespace": "domain-operator-a",
   "sst": "1",
   "sd": "112233",
+  "pool": "60.63.0.0/16",
   "network_name": "gilan",
   "network_master": "ens3",
   "network_range": "10.20.0.0/24",
@@ -246,7 +249,7 @@ curl -X GET \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:93be254
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:temp
     ```
 
 1.  Invoke the below command.
