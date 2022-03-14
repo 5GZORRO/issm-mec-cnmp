@@ -39,7 +39,7 @@ spec:
         import requests
         import sys
         core_namespace = "{{workflow.parameters.core_namespace}}"
-        smf_service_name = "{{workflow.parameters.smf_name}}"
+        smf_name = "{{workflow.parameters.smf_name}}"
         payload = {
           "up_nodes": {
             "upf-{{workflow.name}}": {
@@ -84,7 +84,7 @@ spec:
         headers = {'Content-Type': 'application/json'}
         # TODO: examine rc
         # TODO: change to smf_name
-        r= requests.post('http://%s.%s:8000/upi/v1/upf' % ("smf", core_namespace),
+        r= requests.post('http://%s.%s:8000/upi/v1/upf' % (smf_name, core_namespace),
             json=payload,
             headers=headers)
         sys.stdout.write('Add r.text [%s]\n' % r.text)
