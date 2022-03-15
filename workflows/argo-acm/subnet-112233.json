@@ -7,9 +7,10 @@
     "core_namespace": "domain-operator-a",
     "sst": "1",
     "sd": "112233",
+
     "pool": "60.62.0.0/16",
     "connectedFrom": "gNB",
-    "group": "blue",
+    "group": "group-1",
 
     "network_name": "gilan",
     "network_master": "ens3",

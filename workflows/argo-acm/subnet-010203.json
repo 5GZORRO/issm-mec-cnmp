@@ -7,9 +7,10 @@
     "core_namespace": "domain-operator-a",
     "sst": "1",
     "sd": "010203",
+
     "pool": "60.61.0.0/16",
     "connectedFrom": "gNB",
-    "group": "blue",
+    "group": "group-1",
 
     "networks": [
         {
