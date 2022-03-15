@@ -356,6 +356,9 @@ login with `admin/free5gc`
 
 New subscriber -> accept all defaults -> Submit  
 
+_Note:_ using default values UE `imsi-208930000000003` is being subscribed
+
+`curl -X POST http://<core cluster master ipaddress>:<smf-nodeport>/ue-routes/group-1/members/imsi-208930000000003`
 
 ### **Deploy subnet slice** (010203)
 
