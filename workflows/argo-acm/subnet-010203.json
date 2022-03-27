@@ -1,5 +1,6 @@
 {
     "registry": "84.88.32.158:5000",
+    "kafka_ip": "172.15.0.209",
 
     "cluster": "cluster-1",
     "cluster_core": "cluster-2",

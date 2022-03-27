@@ -62,6 +62,35 @@ spec:
           - name: pod_name
             value: upf-{{workflow.name}}
 
+      - name: parse-upf-sbi-up
+        dependencies: [read-upf-pod]
+        template: jq-script
+        arguments:
+          parameters:
+          - name: namespace
+            value: "{{workflow.namespace}}"
+          - name: json_str
+            value: "{{tasks.read-upf-pod.outputs.parameters.multus-ips}}"
+
+      - name: publish-status
+        dependencies: [parse-upf-sbi-up]
+        template: produce
+        arguments:
+          parameters:
+          - name: kafka_ip
+            value: "{{workflow.parameters.kafka_ip}}"
+          - name: kafka_port
+            value: "{{workflow.parameters.kafka_port}}"
+
+          - name: data
+            value: |
+              { "msg_id": "{{workflow.parameters.msg_id}}",
+                "sbi-ip": "{{tasks.parse-upf-sbi-up.outputs.parameters.sbi-ip}}",
+                "up-ip": "{{tasks.parse-upf-sbi-up.outputs.parameters.up-ip}}",
+              }
+          - name: kafka_topic
+            value: "{{workflow.parameters.topic}}"
+
 
   - name: create-datanetwork-and-upf
     dag:
@@ -202,3 +231,68 @@ spec:
                   "upf_name": "upf-{{workflow.name}}"
                 }
               }
+
+  - name: jq-script
+    inputs:
+      parameters:
+      - name: namespace
+      - name: json_str
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [sh]
+      source: |
+        echo '{{inputs.parameters.json_str}}' | jq -r . | jq -r '.[] | select(.name=="{{inputs.parameters.namespace}}/up") | .ips[0]' > /tmp/up-ip.txt
+        echo '{{inputs.parameters.json_str}}' | jq -r . | jq -r '.[] | select(.name=="{{inputs.parameters.namespace}}/sbi") | .ips[0]' > /tmp/sbi-ip.txt
+
+    outputs:
+      parameters:
+      - name: sbi-ip
+        valueFrom:
+          path: /tmp/sbi-ip.txt
+
+      - name: up-ip
+        valueFrom:
+          path: /tmp/up-ip.txt
+
+  - name: produce
+    # Publish a message into kafka broker
+    #
+    # Parameters
+    # kafka_topic: the topic to publish the message on (string)
+    # kafka_ip: ipaddress of the kafka broker (string)
+    # kafka_port: kafka broker port (number)
+    # data: the payload to publish (json)
+    inputs:
+      parameters:
+      - name: kafka_topic
+      - name: kafka_ip
+      - name: kafka_port
+      - name: data
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import os
+
+        from kafka import KafkaProducer
+        from kafka.errors import KafkaError
+
+        KAFKA_TOPIC = '{{inputs.parameters.kafka_topic}}'
+        KAFKA_TIMEOUT = 10
+        KAFKA_API_VERSION = (1, 1, 0)
+
+        KAFKA_SERVER = "{}:{}".format("{{inputs.parameters.kafka_ip}}", "{{inputs.parameters.kafka_port}}")
+        producer = KafkaProducer(bootstrap_servers=KAFKA_SERVER,
+                                 api_version=KAFKA_API_VERSION,
+                                 value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+
+        t = producer.send(KAFKA_TOPIC, {{inputs.parameters.data}})
+        # Block for 'synchronous' send; set timeout on X seconds
+        try:
+            t.get(timeout=KAFKA_TIMEOUT)
+        except KafkaError as ke:
+            print("1")
+        print ("0")
