@@ -358,23 +358,17 @@ New subscriber -> accept all defaults -> Submit
 
 ### Add UE into topology group
 
-Add the ue into proper topology group.
+Add the ue into proper topology group slice.
 
-Run the below to add `imsi-208930000000003` into `group-1`
+Run the below to add `imsi-208930000000003` into `1-010203`
 
 ```
-curl -X POST http://<core cluster master ipaddress>:<smf-ext-nodeport>/ue-routes/group-1/members/imsi-208930000000003
+curl -X POST http://<core cluster master ipaddress>:<smf-ext-nodeport>/ue-routes/1-010203/members/imsi-208930000000003
 ```
 
 ### **Deploy subnet slice** (010203)
 
 Log into ACM hub cluster
-
-deploy subnet on the blue namespace
-
-```
-kubectl create ns blue
-```
 
 ```
 argo -n domain-operator-b  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch

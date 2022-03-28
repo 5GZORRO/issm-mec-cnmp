@@ -43,7 +43,6 @@ spec:
     - name: networks
 
     - name: connectedFrom
-    - name: group
 
     - name: network_name
       # OVERRIDE values implies not to create datanetwork
@@ -201,8 +200,6 @@ spec:
               - name: connectedFrom
                 value: "{{workflow.parameters.connectedFrom}}"
               
-              - name: group
-                value: "{{workflow.parameters.group}}"
 
   - name: delay-seconds
     inputs:

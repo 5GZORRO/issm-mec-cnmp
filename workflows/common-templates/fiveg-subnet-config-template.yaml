@@ -125,7 +125,7 @@ spec:
         upf_name = "upf-{{workflow.name}}"
         core_namespace = "{{workflow.parameters.core_namespace}}"
         smf_name = "{{workflow.parameters.smf_name}}"
-        group = "{{workflow.parameters.group}}"
+        group = "{{workflow.parameters.sst}}-{{workflow.parameters.sd}}"
         connectedFrom = "{{workflow.parameters.connectedFrom}}"
         sys.stdout.write('Input parameters. upf_name: "%s", core_namespace: "%s", smf_name: "%s", group: "%s", connectedFrom: "%s"\n'
                           % (upf_name, core_namespace, smf_name, group, connectedFrom))
