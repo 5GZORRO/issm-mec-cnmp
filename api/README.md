@@ -8,7 +8,7 @@ Log into OCM cluster
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:93be254
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:2cf31b5
 export NAMESPACE=issm-mec-cnmp
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
@@ -93,6 +93,10 @@ Data payload:
     network_range  - network range in cidr format (str)
     network_start  - start ip in the sequence range (str)
     network_end    - end ip in the sequence range (str)
+
+    product_id     - the product offer ID of the UPF (str in uuid/DID format)
+    elma_url       - url of license agent (http://<ip>:<port>) to verify that
+                     the supplied product_id has a valid license
 ```
 
 Example 1:
@@ -118,7 +122,9 @@ curl -X POST \
         "name": "up", "master": "ens3", "range": "192.168.1.0/24",
         "start": "192.168.1.251", "end": "192.168.1.253"        
     }
-  ]
+  ],
+  "product_id": "id-po-upf-k8s",
+  "elma_url": "http://172.28.3.42:31880"
 }'
 
 {
@@ -154,7 +160,9 @@ curl -X POST \
         "name": "up", "master": "ens3", "range": "192.168.1.0/24",
         "start": "192.168.1.251", "end": "192.168.1.253"        
     }
-  ]
+  ],
+  "product_id": "id-po-upf-k8s",
+  "elma_url": "http://172.28.3.42:31880"
 }'
 
 {
@@ -246,7 +254,7 @@ curl -X GET \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:93be254
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:2cf31b5
     ```
 
 1.  Invoke the below command.

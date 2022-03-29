@@ -29,6 +29,12 @@ spec:
     - name: cluster_core
       value: "OVERRIDE"
 
+    - name: product_id
+      value: "OVERRIDE"
+    # issm-wfm sets this with stakeholder's elma
+    - name: elma_url
+      value: "OVERRIDE"
+
     - name: smf_name
       value: "OVERRIDE"
 
@@ -59,7 +65,6 @@ spec:
     dag:
       tasks:
       - name: create-subnet-deploy-subscription
-        # TODO: wait on status
         template: create-subnet-deploy-subscription
 
       - name: wait-for-subnet-status
@@ -164,6 +169,10 @@ spec:
                 value: "{{workflow.parameters.network_start}}"
               - name: network_end
                 value: "{{workflow.parameters.network_end}}"
+              - name: product_id
+                value: "{{workflow.parameters.product_id}}"
+              - name: elma_url
+                value: "{{workflow.parameters.elma_url}}"
 
   - name: create-subnet-configure-subscription
     inputs:
@@ -232,3 +241,4 @@ spec:
       command: [sh]
       source: |
         kubectl get subscriptions.apps.open-cluster-management.io {{inputs.parameters.subscription_name}} -o json | jq '.status.statuses."{{inputs.parameters.cluster_name}}".packages."{{inputs.parameters.channel_name}}-{{inputs.parameters.cr_name}}-{{inputs.parameters.package_name}}".resourceStatus.outputs.parameters[0].value' | jq -r . | jq -r '.[] | select(.name=="{{inputs.parameters.namespace}}/{{inputs.parameters.network_name}}") | .ips[0]'
+

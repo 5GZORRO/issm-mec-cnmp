@@ -1,4 +1,4 @@
-# Copyright 2021 – 2022 IBM Corporation
+# Copyright 2021 - 2022 IBM Corporation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ spec:
         withParam: "{{workflow.parameters.networks}}"
 
       - name: create-datanetwork
+        dependencies: [create-networks]
         when: "{{workflow.parameters.network_name}} != \"OVERRIDE\""
         templateRef:
           name: network-template
@@ -94,11 +95,19 @@ spec:
                       "dnn_name": "internet",
                       apn_cidr: "10.10.0.0/16"                    
                     }
-                  ]
+                  ],
+                  "elicensing": {
+                    "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
+                    "elma_ip": "{{workflow.parameters.elma_url}}",
+                    "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "descriptor_id": "fiveg-subnet",
+                    "is_active": false
+                  }
                 }
               }
 
       - name: create-upf
+        dependencies: [create-networks]
         when: "{{workflow.parameters.network_name}} == \"OVERRIDE\""
         templateRef:
           name: nf-template
@@ -129,7 +138,14 @@ spec:
                       "dnn_name": "internet",
                       apn_cidr: "10.10.0.0/16"                    
                     }
-                  ]
+                  ],
+                  "elicensing": {
+                    "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
+                    "elma_ip": "{{workflow.parameters.elma_url}}",
+                    "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "descriptor_id": "fiveg-subnet",
+                    "is_active": false
+                  }
                 }
               }
 
@@ -143,3 +159,40 @@ spec:
           parameters:
           - name: pod_name
             value: upf-{{workflow.name}}
+
+  - name: license-check
+    inputs:
+      parameters:
+      - name: product_id
+      - name: elma_url
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        headers = {'Content-Type': 'application/json'}
+        r = requests.post("{{inputs.parameters.elma_url}}/checkLicensing",
+            json={"productId": "{{inputs.parameters.product_id}}",
+            "nsDescriptorId": "fiveg-subnet", "nsInstanceId": ""},
+            headers=headers)
+        print (str(r))
+        with open('/tmp/status.txt', 'w') as f:
+            f.write(str(r.status_code))
+        
+    outputs:
+      parameters:
+      - name: status
+        valueFrom:
+          path: /tmp/status.txt
+
+  - name: fail
+    script:
+      image: debian:9.4
+      imagePullPolicy: IfNotPresent
+      command: [bash]
+      source: |
+        exit 123
