@@ -101,7 +101,7 @@ spec:
                     "elma_ip": "{{workflow.parameters.elma_url}}",
                     "product_offering_id": "{{workflow.parameters.product_id}}",
                     "descriptor_id": "fiveg-subnet",
-                    "is_active": true
+                    "is_active": false
                   }
                 }
               }
@@ -144,7 +144,7 @@ spec:
                     "elma_ip": "{{workflow.parameters.elma_url}}",
                     "product_offering_id": "{{workflow.parameters.product_id}}",
                     "descriptor_id": "fiveg-subnet",
-                    "is_active": true
+                    "is_active": false
                   }
                 }
               }
