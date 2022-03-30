@@ -29,23 +29,8 @@ spec:
         when: "{{workflow.parameters.operation}} == \"create\""
 
     - - name: handle-delete
-        #template: handledelete
-        template: whalesay
-        arguments:
-          parameters:
-          - name: message
-            value: "Handle delete not supported at this moment"
+        template: handledelete
         when: "{{workflow.parameters.operation}} == \"delete\""
-
-  - name: whalesay
-    inputs:
-      parameters:
-      - name: message
-    container:
-      image: docker/whalesay
-      imagePullPolicy: IfNotPresent
-      command: [cowsay]
-      args: ["{{inputs.parameters.message}}"]
 
   - name: handlecreate
     dag:
@@ -55,6 +40,13 @@ spec:
 
       - name: smf-topology-upf
         template: smf-topology-upf
+
+  - name: handledelete
+    # TODO: delete from topology
+    dag:
+      tasks:
+      - name: smf-register-upf-delete
+        template: smf-register-upf-delete
 
   - name: smf-register-upf
     script:
@@ -161,6 +153,38 @@ spec:
 
         headers = {'Content-Type': 'application/json'}
         r= requests.put('http://%s.%s:8080/ue-routes/%s/topology' % (smf_name, core_namespace, group),
+            json=payload,
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+  - name: smf-register-upf-delete
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        def raise_for_status(r):
+            http_error_msg = ''
+            if 400 <= r.status_code < 500:
+                http_error_msg = '%s Client Error: %s' % (r.status_code, r.reason)
+
+            elif 500 <= r.status_code < 600:
+                http_error_msg = '%s Server Error: %s' % (r.status_code, r.reason)
+
+            return http_error_msg
+
+        core_namespace = "{{workflow.parameters.core_namespace}}"
+        smf_name = "{{workflow.parameters.smf_name}}"
+
+        headers = {'Content-Type': 'application/json'}
+        r= requests.delete('http://%s.%s:8000/upi/v1/upf/%s' % (smf_name, core_namespace),
             json=payload,
             headers=headers)
         sys.stdout.write('r.text [%s]\n' % r.text)

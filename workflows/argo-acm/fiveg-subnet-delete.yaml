@@ -89,6 +89,10 @@ spec:
                 value: {{inputs.parameters.smf_name}}
               - name: core_namespace
                 value: {{inputs.parameters.core_namespace}}
+              - name: upf_name
+                # IMPORTANT: must be aligned with the format upf name is
+                # constructed
+                value: "upf-configure-{{workflow.parameters.fiveg_subnet_id}}"
 
               # the below must exist since we re-use the template
               - name: upf_sbi

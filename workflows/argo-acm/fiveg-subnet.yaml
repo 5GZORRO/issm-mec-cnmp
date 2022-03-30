@@ -201,7 +201,9 @@ spec:
 
               - name: connectedFrom
                 value: "{{workflow.parameters.connectedFrom}}"
-              
+
+              - name: upf_name
+                value: ""
 
   - name: delay-seconds
     inputs:
