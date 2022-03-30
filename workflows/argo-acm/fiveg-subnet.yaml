@@ -181,6 +181,8 @@ spec:
               value: configure-{{workflow.name}}
             - path: spec.arguments.parameters
               value:
+              - name: operation
+                value: create
               - name: smf_name
                 value: {{workflow.parameters.smf_name}}
               - name: core_namespace

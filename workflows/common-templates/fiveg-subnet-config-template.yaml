@@ -23,6 +23,31 @@ metadata:
 spec:
   templates:
   - name: handlerequest
+    steps:
+    - - name: handle-create
+        template: handlecreate
+        when: "{{workflow.parameters.operation}} == \"create\""
+
+    - - name: handle-delete
+        #template: handledelete
+        template: whalesay
+        arguments:
+          parameters:
+          - name: message
+            value: "Handle delete not supported at this moment"
+        when: "{{workflow.parameters.operation}} == \"delete\""
+
+  - name: whalesay
+    inputs:
+      parameters:
+      - name: message
+    container:
+      image: docker/whalesay
+      imagePullPolicy: IfNotPresent
+      command: [cowsay]
+      args: ["{{inputs.parameters.message}}"]
+
+  - name: handlecreate
     dag:
       tasks:
       - name: smf-register-upf

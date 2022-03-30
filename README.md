@@ -376,6 +376,12 @@ argo -n domain-operator-b  submit workflows/argo-acm/fiveg-subnet.yaml --paramet
 
 wait for the flow to complete
 
+**NOTE:** to delete a given subnetslice invoke the below setting `fiveg_subnet_id` to its proper value
+
+```bash
+argo -n domain-operator-b  submit workflows/argo-acm/fiveg-subnet-delete.yaml -p fiveg_subnet_id="fiveg-subnet-lx29w" --watch
+```
+
 ### Connect UE to slice
 
 Log into UE VM (192.168.1.107)
