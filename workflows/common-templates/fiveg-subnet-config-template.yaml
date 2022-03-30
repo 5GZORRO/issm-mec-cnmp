@@ -182,10 +182,10 @@ spec:
 
         core_namespace = "{{workflow.parameters.core_namespace}}"
         smf_name = "{{workflow.parameters.smf_name}}"
+        upf_name = "{{workflow.parameters.upf_name}}"
 
         headers = {'Content-Type': 'application/json'}
-        r= requests.delete('http://%s.%s:8000/upi/v1/upf/%s' % (smf_name, core_namespace),
-            json=payload,
+        r= requests.delete('http://%s.%s:8000/upi/v1/upf/%s' % (smf_name, core_namespace, upf_name),
             headers=headers)
         sys.stdout.write('r.text [%s]\n' % r.text)
         error_msg = raise_for_status(r)

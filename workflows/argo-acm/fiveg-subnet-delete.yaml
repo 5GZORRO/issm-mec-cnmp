@@ -48,7 +48,7 @@ spec:
         arguments:
           parameters:
           - name: cluster
-            value: "{{tasks.fiveg-subnet-get.outputs.parameters.cluster}}"
+            value: "{{tasks.fiveg-subnet-get.outputs.parameters.cluster_core}}"
           - name: smf_name
             value: "{{tasks.fiveg-subnet-get.outputs.parameters.smf_name}}"
           - name: core_namespace
@@ -121,9 +121,9 @@ spec:
           name: {{inputs.parameters.wf_name}}
     outputs:
       parameters:
-      - name: cluster
+      - name: cluster_core
         valueFrom:
-          jqFilter: '.spec.arguments.parameters[] | select(.name=="cluster").value'
+          jqFilter: '.spec.arguments.parameters[] | select(.name=="cluster_core").value'
       - name: smf_name
         valueFrom:
           jqFilter: '.spec.arguments.parameters[] | select(.name=="smf_name").value'
