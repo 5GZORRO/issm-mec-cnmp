@@ -52,11 +52,11 @@ spec:
           - name: smf_name
             value: "{{tasks.fiveg-subnet-get.outputs.parameters.smf_name}}"
           - name: core_namespace
-            value: "{{tasks.fiveg-subnet-get.outputs.parameters.core_namespace}}"            
+            value: "{{tasks.fiveg-subnet-get.outputs.parameters.core_namespace}}"
           - name: sst
-            value: "{{tasks.fiveg-subnet-get.outputs.parameters.sst}}"            
+            value: "{{tasks.fiveg-subnet-get.outputs.parameters.sst}}"
           - name: sd
-            value: "{{tasks.fiveg-subnet-get.outputs.parameters.sd}}"            
+            value: "{{tasks.fiveg-subnet-get.outputs.parameters.sd}}"
 
   - name: create-subnet-configure-subscription
     inputs:

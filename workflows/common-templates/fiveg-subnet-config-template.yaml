@@ -221,7 +221,12 @@ spec:
         smf_name = "{{workflow.parameters.smf_name}}"
         sst = "{{workflow.parameters.sst}}"
         sd = "{{workflow.parameters.sd}}"
+        # both retrieved from jq which appends '/n'
+        sst = sst.strip()
+        sd = sd.strip()
+
         group = "%s-%s" % (sst, sd)
+
         sys.stdout.write('Input parameters. upf_name: "%s", core_namespace: "%s", smf_name: "%s", group: "%s" \n'
                           % (upf_name, core_namespace, smf_name, group))
 
