@@ -53,6 +53,10 @@ spec:
             value: "{{tasks.fiveg-subnet-get.outputs.parameters.smf_name}}"
           - name: core_namespace
             value: "{{tasks.fiveg-subnet-get.outputs.parameters.core_namespace}}"            
+          - name: sst
+            value: "{{tasks.fiveg-subnet-get.outputs.parameters.sst}}"            
+          - name: sd
+            value: "{{tasks.fiveg-subnet-get.outputs.parameters.sd}}"            
 
   - name: create-subnet-configure-subscription
     inputs:
@@ -60,6 +64,8 @@ spec:
       - name: cluster
       - name: smf_name
       - name: core_namespace
+      - name: sst
+      - name: sd
     resource:
       action: create
       setOwnerReference: true
@@ -89,19 +95,19 @@ spec:
                 value: {{inputs.parameters.smf_name}}
               - name: core_namespace
                 value: {{inputs.parameters.core_namespace}}
-              - name: upf_name
-                # IMPORTANT: must be aligned with the format upf name is
-                # constructed
-                value: "upf-configure-{{workflow.parameters.fiveg_subnet_id}}"
+
+              - name: fiveg_subnet_id
+                value: "{{workflow.parameters.fiveg_subnet_id}}"
+
+              - name: sst
+                value: "{{inputs.parameters.sst}}"
+              - name: sd
+                value: "{{inputs.parameters.sd}}"
 
               # the below must exist since we re-use the template
               - name: upf_sbi
                 value: ""
               - name: upf_up
-                value: ""
-              - name: sst
-                value: ""
-              - name: sd
                 value: ""
               - name: pool
                 value: ""
@@ -130,6 +136,12 @@ spec:
       - name: core_namespace
         valueFrom:
           jqFilter: '.spec.arguments.parameters[] | select(.name=="core_namespace").value'
+      - name: sst
+        valueFrom:
+          jqFilter: '.spec.arguments.parameters[] | select(.name=="sst").value'
+      - name: sd
+        valueFrom:
+          jqFilter: '.spec.arguments.parameters[] | select(.name=="sd").value'
 
   - name: delete-wf
     inputs:

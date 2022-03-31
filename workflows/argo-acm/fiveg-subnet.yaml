@@ -202,8 +202,8 @@ spec:
               - name: connectedFrom
                 value: "{{workflow.parameters.connectedFrom}}"
 
-              - name: upf_name
-                value: ""
+              - name: fiveg_subnet_id
+                value: "{{workflow.name}}"
 
   - name: delay-seconds
     inputs:
