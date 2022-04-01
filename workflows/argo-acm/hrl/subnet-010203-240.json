@@ -1,0 +1,31 @@
+{
+    "registry": "172.15.0.167:5000",
+    "kafka_ip": "172.15.0.209",
+
+    "cluster": "cluster-240",
+    "cluster_core": "cluster-150",
+    "smf_name": "smf-sample",
+    "core_namespace": "domain-operator-a",
+    "sst": "1",
+    "sd": "010203",
+
+    "pool": "60.61.0.0/16",
+    "connectedFrom": "gNB",
+
+    "networks": [
+        {
+            "name": "sbi",
+            "master": "ens160",
+            "range": "10.100.200.0/24",
+            "start": "10.100.200.41",
+            "end": "10.100.200.60"
+        },
+        {
+            "name": "up",
+            "master": "ens160",
+            "range": "172.15.0.0/24",
+            "start": "172.15.0.11",
+            "end": "172.15.0.20"
+        }
+    ]
+}
