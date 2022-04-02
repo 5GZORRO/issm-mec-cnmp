@@ -214,7 +214,7 @@ spec:
 
             return http_error_msg
 
-        upf_name = "{{workflow.parameters.upf_name}}"
+        upf_name = "{{workflow.parameters.fiveg_subnet_id}}"
         core_namespace = "{{workflow.parameters.core_namespace}}"
         smf_name = "{{workflow.parameters.smf_name}}"
         sst = "{{workflow.parameters.sst}}"

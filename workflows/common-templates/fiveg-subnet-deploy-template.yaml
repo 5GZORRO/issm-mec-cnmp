@@ -60,7 +60,7 @@ spec:
         arguments:
           parameters:
           - name: pod_name
-            value: {{workflow.parameters.upf_name}}
+            value: "{{workflow.parameters.fiveg_subnet_id}}"
 
       - name: parse-upf-sbi-up
         dependencies: [read-upf-pod]
