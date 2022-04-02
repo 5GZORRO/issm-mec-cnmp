@@ -2,7 +2,7 @@
 
 Component responsible for providing API endpoints for ISSM-MEC-CNMP.
 
-**Important:** on every `fiveg-***` workflow modification - rebuild and tag the image accordingly**
+**Important:** on every `fiveg-***` workflow modification - rebuild and tag the image accordingly
 
 ## Deploy the service
 
