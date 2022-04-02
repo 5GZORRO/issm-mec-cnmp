@@ -153,6 +153,9 @@ spec:
               - name: msg_id
                 value: "deploy-{{workflow.name}}"
 
+              - name: fiveg_subnet_id
+                value: "{{workflow.name}}"
+
   - name: create-subnet-configure-subscription
     inputs:
       parameters:
@@ -204,6 +207,7 @@ spec:
 
               - name: fiveg_subnet_id
                 value: "{{workflow.name}}"
+
 
   - name: delay-seconds
     inputs:

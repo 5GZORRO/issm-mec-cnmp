@@ -60,7 +60,7 @@ spec:
         arguments:
           parameters:
           - name: pod_name
-            value: upf-{{workflow.name}}
+            value: {{workflow.parameters.upf_name}}
 
       - name: parse-upf-sbi-up
         dependencies: [read-upf-pod]
@@ -125,16 +125,16 @@ spec:
           - name: nf_kind
             value: Upf
           - name: nf_name
-            value: "upf-{{workflow.name}}"
+            value: "{{workflow.parameters.fiveg_subnet_id}}"
           - name: success_condition
-            value: "status.outputs.podname == upf-{{workflow.name}}"
+            value: "status.outputs.podname == {{workflow.parameters.fiveg_subnet_id}}"
           - name: nf_spec
             value: |
               {
                 "config": {
                   "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
-                  "upf_name": "upf-{{workflow.name}}",
+                  "upf_name": "{{workflow.parameters.fiveg_subnet_id}}",
                   "data_network_name": "{{workflow.parameters.network_name}}",
                   "dnns": [
                     {
@@ -158,16 +158,16 @@ spec:
           - name: nf_kind
             value: Upf
           - name: nf_name
-            value: "upf-{{workflow.name}}"
+            value: "{{workflow.parameters.fiveg_subnet_id}}"
           - name: success_condition
-            value: "status.outputs.podname == upf-{{workflow.name}}"
+            value: "status.outputs.podname == {{workflow.parameters.fiveg_subnet_id}}"
           - name: nf_spec
             value: |
               {
                 "config": {
                   "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
-                  "upf_name": "upf-{{workflow.name}}",
+                  "upf_name": "{{workflow.parameters.fiveg_subnet_id}}",
                   "data_network_name": "{{workflow.parameters.network_name}}"
                 }
               }
@@ -188,16 +188,16 @@ spec:
           - name: nf_kind
             value: Upf
           - name: nf_name
-            value: "upf-{{workflow.name}}"
+            value: "{{workflow.parameters.fiveg_subnet_id}}"
           - name: success_condition
-            value: "status.outputs.podname == upf-{{workflow.name}}"            
+            value: "status.outputs.podname == {{workflow.parameters.fiveg_subnet_id}}"            
           - name: nf_spec
             value: |
               {
                 "config": {
                   "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
-                  "upf_name": "upf-{{workflow.name}}",
+                  "upf_name": "{{workflow.parameters.fiveg_subnet_id}}",
                   "dnns": [
                     {
                       "dnn_name": "internet",
@@ -219,16 +219,16 @@ spec:
           - name: nf_kind
             value: Upf
           - name: nf_name
-            value: "upf-{{workflow.name}}"
+            value: "{{workflow.parameters.fiveg_subnet_id}}"
           - name: success_condition
-            value: "status.outputs.podname == upf-{{workflow.name}}"            
+            value: "status.outputs.podname == {{workflow.parameters.fiveg_subnet_id}}"            
           - name: nf_spec
             value: |
               {
                 "config": {
                   "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
-                  "upf_name": "upf-{{workflow.name}}"
+                  "upf_name": "{{workflow.parameters.fiveg_subnet_id}}"
                 }
               }
 
