@@ -74,7 +74,7 @@ spec:
         smf_name = "{{workflow.parameters.smf_name}}"
         payload = {
           "up_nodes": {
-            "upf-{{workflow.name}}": {
+            "{{workflow.parameters.fiveg_subnet_id}}": {
               "type": "UPF",
               "node_id": "{{workflow.parameters.upf_sbi}}",
               "sNssaiUpfInfos": [
@@ -110,7 +110,7 @@ spec:
         if pool != "0.0.0.0/16":
             sys.stdout.write('Add pool [%s]\n' % pool)
             # NOTE: UPF is related to a single slice
-            payload["up_nodes"]["upf-{{workflow.name}}"]["sNssaiUpfInfos"][0]["dnnUpfInfoList"][0]["pools"] = [{"cidr": "{{workflow.parameters.pool}}"}]
+            payload["up_nodes"]["{{workflow.parameters.fiveg_subnet_id}}"]["sNssaiUpfInfos"][0]["dnnUpfInfoList"][0]["pools"] = [{"cidr": "{{workflow.parameters.pool}}"}]
 
         headers = {'Content-Type': 'application/json'}
         r= requests.post('http://%s.%s:8000/upi/v1/upf' % (smf_name, core_namespace),
@@ -141,7 +141,7 @@ spec:
 
             return http_error_msg
 
-        upf_name = "upf-{{workflow.name}}"
+        upf_name = "{{workflow.parameters.fiveg_subnet_id}}"
         core_namespace = "{{workflow.parameters.core_namespace}}"
         smf_name = "{{workflow.parameters.smf_name}}"
         group = "{{workflow.parameters.sst}}-{{workflow.parameters.sd}}"
@@ -184,8 +184,7 @@ spec:
 
         core_namespace = "{{workflow.parameters.core_namespace}}"
         smf_name = "{{workflow.parameters.smf_name}}"
-        # IMPORTANT: name *must* be aligned with the one constructed during creation
-        upf_name = "upf-configure-{{workflow.parameters.fiveg_subnet_id}}"
+        upf_name = "{{workflow.parameters.fiveg_subnet_id}}"
 
         headers = {'Content-Type': 'application/json'}
         r= requests.delete('http://%s.%s:8000/upi/v1/upf/%s' % (smf_name, core_namespace, upf_name),
@@ -215,8 +214,7 @@ spec:
 
             return http_error_msg
 
-        # IMPORTANT: name *must* be aligned with the one constructed during creation
-        upf_name = "upf-configure-{{workflow.parameters.fiveg_subnet_id}}"
+        upf_name = "{{workflow.parameters.fiveg_subnet_id}}"
         core_namespace = "{{workflow.parameters.core_namespace}}"
         smf_name = "{{workflow.parameters.smf_name}}"
         sst = "{{workflow.parameters.sst}}"
