@@ -274,7 +274,7 @@ spec:
         consumer = KafkaConsumer(bootstrap_servers=KAFKA_SERVER,
                                  client_id="aaa",
                                  enable_auto_commit=True,
-                                 api_version=KAFKA_API_VERSION, group_id='aaa-group-id')
+                                 api_version=KAFKA_API_VERSION, group_id=MSG_ID)
         consumer.subscribe(pattern=KAFKA_TOPIC)
 
         for msg in consumer:
