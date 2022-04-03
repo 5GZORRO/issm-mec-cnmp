@@ -282,7 +282,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf:v3.0.6-dynamic-load",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf:v3.0.6-dynamic-load-2a0e447",
                   "image_ext": "{{workflow.parameters.registry}}/weit/free5gc-smf-ext:v3.0.6-dynamic-load",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "smf_name": "smf-sample",
