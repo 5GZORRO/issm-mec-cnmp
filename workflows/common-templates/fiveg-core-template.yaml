@@ -296,6 +296,14 @@ spec:
                 }
               }
 
+      - name: register-ues
+        dependencies: [create-smf]
+        template: register-ues
+        arguments:
+          parameters:
+          - name: group
+            value: "1-010203"
+
       - name: create-webconsole
         dependencies: [create-mongo]
         templateRef:
@@ -320,4 +328,52 @@ spec:
                   "mongo_ip_address": "mongo-sample-sbi"
                   }
               }
-  
+
+  - name: register-ues
+    inputs:
+      parameters:
+      - name: group
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        def raise_for_status(r):
+            http_error_msg = ''
+            if 400 <= r.status_code < 500:
+                http_error_msg = '%s Client Error: %s' % (r.status_code, r.reason)
+
+            elif 500 <= r.status_code < 600:
+                http_error_msg = '%s Server Error: %s' % (r.status_code, r.reason)
+
+            return http_error_msg
+
+        smf_name = "smf-sample"
+        group = "{{inputs.parameters.group}}"
+        sys.stdout.write('Input parameters. smf_name: "%s", group: "%s"\n'
+                          % (smf_name, group))
+        headers = {'Content-Type': 'application/json'}
+        r= requests.post('http://%s:8080/ue-routes/%s/members/imsi-208930000000003' % (smf_name, group),
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+        r= requests.post('http://%s:8080/ue-routes/%s/members/imsi-208930000000004' % (smf_name, group),
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+        r= requests.post('http://%s:8080/ue-routes/%s/members/imsi-208930000000005' % (smf_name, group),
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
