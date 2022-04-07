@@ -117,6 +117,12 @@ export NAMESPACE=domain-operator-c
 kubectl apply -f  workflows/common-templates  -n $NAMESPACE
 ```
 
+## Kafka
+
+Components synch among each other using kafka bus
+
+Install and configure kafka [here](./docs/kafka.md)
+
 ## 5G Operator
 
 5G Operator acts as a VMFM for free5gc network functions
@@ -396,7 +402,7 @@ Customize free5gc-ue.yaml to use slice 010203
  # List of gNB IP addresses for Radio Link Simulation
  gnbSearchList:
 -  - 127.0.0.1
-+  - 172.15.0.211
++  - 192.168.1.133
 
  # Initial PDU sessions to be established
  sessions:
@@ -405,7 +411,6 @@ Customize free5gc-ue.yaml to use slice 010203
  default-nssai:
    - sst: 1
 -    sd: 1
-+    sd: 010203
 
  # Supported encryption algorithms by this UE
  integrity:
