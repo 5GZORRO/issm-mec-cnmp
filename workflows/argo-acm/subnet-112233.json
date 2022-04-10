@@ -1,6 +1,6 @@
 {
     "registry": "84.88.32.158:5000",
-    "kafka_ip": "172.15.0.209",
+    "kafka_ip": "192.168.1.66",
 
     "cluster": "cluster-1",
     "cluster_core": "cluster-2",
@@ -32,5 +32,7 @@
             "start": "192.168.1.251",
             "end": "192.168.1.253"
         }
-    ]
+    ],
+    "elma_url": "http://172.28.3.42:31880",
+    "product_id": "EEyymp33AzSYHZFwvT8Bvp"
 }

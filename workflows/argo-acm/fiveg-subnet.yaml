@@ -29,6 +29,12 @@ spec:
     - name: cluster_core
       value: "OVERRIDE"
 
+    - name: product_id
+      value: "OVERRIDE"
+    # issm-wfm sets this with stakeholder's elma
+    - name: elma_url
+      value: "OVERRIDE"
+
     - name: smf_name
       value: "OVERRIDE"
 
@@ -139,6 +145,10 @@ spec:
                 value: "{{workflow.parameters.network_start}}"
               - name: network_end
                 value: "{{workflow.parameters.network_end}}"
+              - name: product_id
+                value: "{{workflow.parameters.product_id}}"
+              - name: elma_url
+                value: "{{workflow.parameters.elma_url}}"
 
               - name: pool
                 value: "{{workflow.parameters.pool}}"

@@ -141,7 +141,14 @@ spec:
                       "dnn_name": "internet",
                       apn_cidr: "{{workflow.parameters.pool}}"
                     }
-                  ]
+                  ],
+                  "elicensing": {
+                    "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
+                    "elma_ip": "{{workflow.parameters.elma_url}}",
+                    "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "descriptor_id": "fiveg-subnet",
+                    "is_active": false
+                  }
                 }
               }
 
@@ -168,7 +175,14 @@ spec:
                   "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "upf_name": "{{workflow.parameters.fiveg_subnet_id}}",
-                  "data_network_name": "{{workflow.parameters.network_name}}"
+                  "data_network_name": "{{workflow.parameters.network_name}}",
+                  "elicensing": {
+                    "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
+                    "elma_ip": "{{workflow.parameters.elma_url}}",
+                    "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "descriptor_id": "fiveg-subnet",
+                    "is_active": false
+                  }
                 }
               }
 
@@ -203,7 +217,14 @@ spec:
                       "dnn_name": "internet",
                       apn_cidr: "{{workflow.parameters.pool}}"
                     }
-                  ]
+                  ],
+                  "elicensing": {
+                    "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
+                    "elma_ip": "{{workflow.parameters.elma_url}}",
+                    "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "descriptor_id": "fiveg-subnet",
+                    "is_active": false
+                  }
                 }
               }
 
@@ -228,7 +249,14 @@ spec:
                 "config": {
                   "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
-                  "upf_name": "{{workflow.parameters.fiveg_subnet_id}}"
+                  "upf_name": "{{workflow.parameters.fiveg_subnet_id}}",
+                  "elicensing": {
+                    "image": "{{workflow.parameters.registry}}/elicensing-manager-agent/elma_sidecar:gitlab-ci",
+                    "elma_ip": "{{workflow.parameters.elma_url}}",
+                    "product_offering_id": "{{workflow.parameters.product_id}}",
+                    "descriptor_id": "fiveg-subnet",
+                    "is_active": false
+                  }
                 }
               }
 

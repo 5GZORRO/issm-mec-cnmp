@@ -258,6 +258,13 @@ def subnet():
                           in SMF ue topology
     :type connectedFrom: ``str``
 
+    :param product_id: product offer DID of the UPF. Optional
+    :type product_id: ``str`` in uuid/DID format
+
+    :param elma_url:   url of license agent (http://<ip>:<port>) to verify that
+                       the supplied product_id has a valid license. Optional
+    :type elma_url: ``str``
+
     :param networks: list of networks to create and used by the slice functions
             each entry includes the following attributes:
                 "name": network name
@@ -294,6 +301,8 @@ def subnet():
         network_start = value.get('network_start', 'OVERRIDE')
         network_end = value.get('network_end', 'OVERRIDE')
         networks = value.get('networks')
+        product_id = value.get('product_id', 'OVERRIDE')
+        elma_url = value.get('elma_url', 'OVERRIDE')
 
         with open('/fiveg-subnet.yaml') as f:
             _yaml = yaml.load(f, Loader=yaml.FullLoader)
@@ -309,7 +318,8 @@ def subnet():
             network_master=network_master,
             network_range=network_range,
             network_start=network_start,
-            network_end=network_end, networks=json.dumps(networks)
+            network_end=network_end, networks=json.dumps(networks),
+            product_id=product_id, elma_url=elma_url
         )
         response = flask.jsonify(res_json)
         response.status_code = 200
