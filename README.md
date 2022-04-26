@@ -1,5 +1,9 @@
 # issm-mec-cnmp
 
+The goal of the platform is to deploy 5G slices natively on K8s in a multi-cluster environment to allow K8s native applications to consume 5G networking directly in the K8s clusters serving as NFVI. The design is VIM-less. Both slice and applications are treated as K8s native services. Kubernitized free5GC is used as a running example to illustrate th econcepts.
+
+# issm-mec-cnmp
+
 Use [these instructions](docs/kubernetes.md) to deploy three kubernetes clusters
 
 * OCM Hub: 1 master, 1 worker
