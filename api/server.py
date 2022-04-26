@@ -31,6 +31,12 @@ from kubernetes.client.rest import ApiException
 registry_private_free5gc = os.getenv('REGISTRY_PRIVATE_FREE5GC')
 print ('**registry_private_free5gc: %s**' % registry_private_free5gc)
 
+KAFKA_HOST = os.getenv('KAFKA_HOST')
+print ('**kafka_host: %s**' % KAFKA_HOST)
+
+KAFKA_PORT = str(os.getenv('KAFKA_PORT'))
+print ('**kafka_port: %s**' % KAFKA_PORT)
+
 
 def find(l, predicate):
     results = [x for x in l if predicate(x)]
@@ -49,16 +55,17 @@ def raise_for_status(r):
     return http_error_msg
 
 
-def core_workflow_template(workflow_cr, core_subnet, **kwargs):
+def core_workflow_template(workflow_cr, wf_name, **kwargs):
     def _build_params(**dn):
         if dn is not None:
             return [dict(name=k, value=dn[k]) for k in dn]
         else:
             return None
-#    if kwargs.get('sd'):
-#        workflow_cr['metadata']['name'] = 'fiveg-%s-%s' % (core_subnet, kwargs['sd'])
-#    else:
-#        workflow_cr['metadata']['name'] = 'fiveg-%s' % core_subnet
+
+    if wf_name:
+        del workflow_cr['metadata']['generateName']
+        workflow_cr['metadata']['name'] = wf_name
+
     workflow_cr['spec']['arguments']['parameters'] = _build_params(**kwargs)
 
     return workflow_cr
@@ -74,10 +81,10 @@ class Proxy:
         self.core_api = kubernetes.client.CoreV1Api()
         sys.stdout.write('Proxy application initialized\n')
 
-    def create_workflow(self, workflow_cr, core_subnet='subnet', **kwargs):
+    def create_workflow(self, workflow_cr, wf_name=None, **kwargs):
         del workflow_cr['spec']['arguments']['parameters']
         workflow_cr = core_workflow_template(workflow_cr=workflow_cr,
-                                             core_subnet=core_subnet,
+                                             wf_name=wf_name,
                                              **kwargs)
 
         sys.stdout.write('[DEBUG] created skeleton: %s \n' % workflow_cr)
@@ -189,7 +196,7 @@ def core():
             _yaml = yaml.load(f, Loader=yaml.FullLoader)
 
         res_json = proxy_server.create_workflow(
-            workflow_cr=_yaml, namespace=namespace, core_subnet='core',
+            workflow_cr=_yaml, namespace=namespace,
             registry=registry,
             cluster=cluster, networks=json.dumps(networks)
         )
@@ -243,6 +250,21 @@ def subnet():
     :param sd: slice differentiator e.g. "010203"
     :type sd: ``str``
 
+    :param pool: subnet (in cidr format) to be assigned to this UPF e.g. "60.61.0.0/16". Optional
+                 Required for anchor UPF
+    :type pool: ``str``
+
+    :param connectedFrom: the id of a UPF, this subnetslice will be a child of,
+                          in SMF ue topology
+    :type connectedFrom: ``str``
+
+    :param product_id: product offer DID of the UPF. Optional
+    :type product_id: ``str`` in uuid/DID format
+
+    :param elma_url:   url of license agent (http://<ip>:<port>) to verify that
+                       the supplied product_id has a valid license. Optional
+    :type elma_url: ``str``
+
     :param networks: list of networks to create and used by the slice functions
             each entry includes the following attributes:
                 "name": network name
@@ -258,6 +280,10 @@ def subnet():
 
         namespace = value.get('namespace')
         registry = value.get('registry', registry_private_free5gc)
+
+        kafka_ip = value.get('kafka_host', KAFKA_HOST)
+        kafka_port = str(value.get('kafka_port', KAFKA_PORT))
+
         cluster_core = value['cluster_core']
         cluster = value['cluster']
 
@@ -266,14 +292,17 @@ def subnet():
         sst = value.get('sst', "1")
         sd = value['sd']
 
+        pool = value.get('pool', '0.0.0.0/16')
+        connectedFrom = value['connectedFrom']
+
         network_name = value.get('network_name', 'OVERRIDE')
         network_master = value.get('network_master', 'OVERRIDE')
         network_range = value.get('network_range', 'OVERRIDE')
         network_start = value.get('network_start', 'OVERRIDE')
         network_end = value.get('network_end', 'OVERRIDE')
         networks = value.get('networks')
-        product_id = value.get('product_id')
-        elma_url = value.get('elma_url')
+        product_id = value.get('product_id', 'OVERRIDE')
+        elma_url = value.get('elma_url', 'OVERRIDE')
 
         with open('/fiveg-subnet.yaml') as f:
             _yaml = yaml.load(f, Loader=yaml.FullLoader)
@@ -281,8 +310,10 @@ def subnet():
         res_json = proxy_server.create_workflow(
             workflow_cr=_yaml, namespace=namespace,
             registry=registry,
+            kafka_ip=kafka_ip, kafka_port=kafka_port,
             cluster_core=cluster_core, cluster=cluster,
             smf_name=smf_name, core_namespace=core_namespace, sst=sst, sd=sd,
+            pool=pool, connectedFrom=connectedFrom,
             network_name=network_name,
             network_master=network_master,
             network_range=network_range,
@@ -334,6 +365,48 @@ def get_core_subnetslice(namespace, name):
         response.status_code = 500
         return response
 
+
+@proxy.route("/subnetslice/<namespace>/<name>",  methods=['DELETE'])
+def delete_subnet(namespace, name):
+    """
+    Delete a subnet slice.
+
+    :param namespace: the namespace of the subnetslice to delete
+    :type namespace: ``str``
+
+    :param name: the name of the subnetslice to delete
+    :type name: ``str``
+    """
+    sys.stdout.write('Received delete subnetslice request\n')
+    try:
+        with open('/fiveg-subnet-delete.yaml') as f:
+            _yaml = yaml.load(f, Loader=yaml.FullLoader)
+
+        proxy_server.create_workflow(
+            workflow_cr=_yaml, wf_name='delete-%s' % name,
+            namespace=namespace,
+            fiveg_subnet_id=name
+        )
+
+        response = flask.jsonify({'OK': 204})
+        response.status_code = 204
+
+    except HTTPException as e:
+        sys.stdout.write('Exit delete /subnetslice %s\n' % str(e))
+        return e
+
+    except ApiException as e:
+        response = flask.jsonify({'error': 'Reason: %s. Body: %s'
+                                  % (e.reason, e.body)})
+        response.status_code = e.status
+
+    except Exception as e:
+        response = flask.jsonify({'error': 'Internal error. {}'.format(e)})
+        response.status_code = 500
+
+    sys.stdout.write('Exit delete /subnetslice %s\n' % str(response))
+    return response
+    
 
 
 def main():

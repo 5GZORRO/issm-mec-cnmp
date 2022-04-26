@@ -2,16 +2,29 @@
 
 Component responsible for providing API endpoints for ISSM-MEC-CNMP.
 
+**Important:** on every `fiveg-***` workflow modification - rebuild and tag the image accordingly
+
 ## Deploy the service
 
 Log into OCM cluster
 
+Invoke the below in this order
+
+**Note:** you may need to update below settings according to your environment
+
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:2cf31b5
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:ade1cf0
 export NAMESPACE=issm-mec-cnmp
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
+
+```
+export KAFKA_HOST=192.168.1.66
+export KAFKA_PORT=9092
+```
+
+Deploy
 
 ```
 kubectl create ns $NAMESPACE
@@ -113,6 +126,8 @@ curl -X POST \
   "core_namespace": "domain-operator-a",
   "sst": "1",
   "sd": "010203",
+  "pool": "60.61.0.0/16",
+  "connectedFrom": "gNB",
   "networks": [
     {
         "name": "sbi", "master": "ens3", "range": "10.100.200.0/24",
@@ -123,7 +138,7 @@ curl -X POST \
         "start": "192.168.1.251", "end": "192.168.1.253"        
     }
   ],
-  "product_id": "id-po-upf-k8s",
+  "product_id": "EEyymp33AzSYHZFwvT8Bvp",
   "elma_url": "http://172.28.3.42:31880"
 }'
 
@@ -146,6 +161,8 @@ curl -X POST \
   "core_namespace": "domain-operator-a",
   "sst": "1",
   "sd": "112233",
+  "pool": "60.62.0.0/16",
+  "connectedFrom": "gNB",
   "network_name": "gilan",
   "network_master": "ens3",
   "network_range": "10.20.0.0/24",
@@ -161,7 +178,7 @@ curl -X POST \
         "start": "192.168.1.251", "end": "192.168.1.253"        
     }
   ],
-  "product_id": "id-po-upf-k8s",
+  "product_id": "EEyymp33AzSYHZFwvT8Bvp",
   "elma_url": "http://172.28.3.42:31880"
 }'
 
@@ -242,6 +259,26 @@ curl -X GET \
 }
 ```
 
+### Delete slice
+
+Delete a given slice
+
+```
+curl -X DELETE http://<ocm master ipaddress>:30055/subnetslice/<namespace>/<name>
+
+REST path:
+    ocm master ipaddress - ipaddress of OCM Hub.
+    namespace   - the namespace of the subnetslice
+    name - the name of the subnetslice as being returned from the POST endpoint (str)
+```
+
+Example:
+
+```bash
+curl -X DELETE \
+  http://192.168.1.117:30055/subnetslice/domain-operator-b/fiveg-subnet-j7dlm
+```
+
 ## Build (**relevant for developers only**)
 
 1.  Set the `REGISTRY` environment variable to hold the name of your docker registry. The following command sets it
@@ -254,7 +291,7 @@ curl -X GET \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:2cf31b5
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:ade1cf0
     ```
 
 1.  Invoke the below command.

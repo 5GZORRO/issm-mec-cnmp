@@ -1,5 +1,6 @@
 {
     "registry": "84.88.32.158:5000",
+    "kafka_ip": "192.168.1.66",
 
     "cluster": "cluster-1",
     "cluster_core": "cluster-2",
@@ -7,6 +8,9 @@
     "core_namespace": "domain-operator-a",
     "sst": "1",
     "sd": "112233",
+
+    "pool": "60.62.0.0/16",
+    "connectedFrom": "gNB",
 
     "network_name": "gilan",
     "network_master": "ens3",
@@ -30,5 +34,5 @@
         }
     ],
     "elma_url": "http://172.28.3.42:31880",
-    "product_id": "id-po-upf-k8s"
+    "product_id": "EEyymp33AzSYHZFwvT8Bvp"
 }

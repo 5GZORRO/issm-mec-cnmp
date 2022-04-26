@@ -23,3 +23,8 @@ spec:
         env:
         - name: REGISTRY_PRIVATE_FREE5GC
           value: "$REGISTRY_PRIVATE_FREE5GC"
+        - name: KAFKA_HOST
+          value: "$KAFKA_HOST"
+        - name: KAFKA_PORT
+          value: "$KAFKA_PORT"
+          

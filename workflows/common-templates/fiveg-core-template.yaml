@@ -1,4 +1,4 @@
-# Copyright 2021 – 2022 IBM Corporation
+# Copyright 2021 - 2022 IBM Corporation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nrf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nrf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "nrf_name": "nrf-sample",
                   "mnc": "93",
@@ -115,7 +115,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udr",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udr:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "udr_name": "udr-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -143,7 +143,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udm",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udm:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "udm_name": "udm-sample",
                   "nrf_ip_address": "nrf-sample-sbi"
@@ -169,7 +169,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-ausf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-ausf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "ausf_name": "ausf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -196,7 +196,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nssf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nssf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "nssf_name": "nssf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -225,7 +225,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-amf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-amf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "amf_name": "amf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -254,7 +254,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-pcf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-pcf:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "pcf_name": "pcf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -282,7 +282,8 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf:v3.0.6-dynamic-load-2a0e447",
+                  "image_ext": "{{workflow.parameters.registry}}/weit/free5gc-smf-ext:v3.0.6-dynamic-load-c6fee5a",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "smf_name": "smf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -294,6 +295,14 @@ spec:
                   ]
                 }
               }
+
+#      - name: register-ues
+#        dependencies: [create-smf]
+#        template: register-ues
+#        arguments:
+#          parameters:
+#          - name: group
+#            value: "1-010203"
 
       - name: create-webconsole
         dependencies: [create-mongo]
@@ -314,9 +323,57 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-webui",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-webui:v3.0.6",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "mongo_ip_address": "mongo-sample-sbi"
                   }
               }
-  
+
+  - name: register-ues
+    inputs:
+      parameters:
+      - name: group
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        def raise_for_status(r):
+            http_error_msg = ''
+            if 400 <= r.status_code < 500:
+                http_error_msg = '%s Client Error: %s' % (r.status_code, r.reason)
+
+            elif 500 <= r.status_code < 600:
+                http_error_msg = '%s Server Error: %s' % (r.status_code, r.reason)
+
+            return http_error_msg
+
+        smf_name = "smf-sample"
+        group = "{{inputs.parameters.group}}"
+        sys.stdout.write('Input parameters. smf_name: "%s", group: "%s"\n'
+                          % (smf_name, group))
+        headers = {'Content-Type': 'application/json'}
+        r= requests.post('http://%s:8080/ue-routes/%s/members/imsi-208930000000003' % (smf_name, group),
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+        r= requests.post('http://%s:8080/ue-routes/%s/members/imsi-208930000000004' % (smf_name, group),
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+        r= requests.post('http://%s:8080/ue-routes/%s/members/imsi-208930000000005' % (smf_name, group),
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))

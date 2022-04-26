@@ -8,6 +8,7 @@ Log into kubernetes master
 cd ~
 git clone https://github.com/5GZORRO/issm-mec-cnmp-5g-operator.git
 cd issm-mec-cnmp-5g-operator
+git checkout v3.0.6-dynamic-load
 ```
 
 ## golang

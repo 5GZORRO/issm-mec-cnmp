@@ -121,6 +121,12 @@ export NAMESPACE=domain-operator-c
 kubectl apply -f  workflows/common-templates  -n $NAMESPACE
 ```
 
+## Kafka
+
+Components synch among each other using kafka bus
+
+Install and configure kafka [here](./docs/kafka.md)
+
 ## 5G Operator
 
 5G Operator acts as a VNFM for free5gc network functions
@@ -150,8 +156,8 @@ sudo apt install net-tools
 
 ```
 cd ~
-git clone https://github.com/PrinzOwO/gtp5g && cd gtp5g
-git checkout tags/v0.3.2
+git clone https://github.com/free5gc/gtp5g.git && cd gtp5g
+git checkout tags/v0.4.1
 make clean && make
 sudo make install
 ```
@@ -174,16 +180,31 @@ Refer [here](./5ginitcontainer) for more details
 
 Log into host installed with docker and has access to docker.pkg.github.com
 
-**Note:** ensure to build images out from free5gc `v3.0.5`
+**Note:** ensure to build images out from free5gc `v3.0.6` and the dynamic-load version of smf
 
 ### Build
 
 ```
+# Clone free5gc-compose project
 cd ~
-git clone https://github.com/free5gc/free5gc-compose.git
+git clone git@github.ibm.com:WEIT/free5gc-compose.git
 cd free5gc-compose
-git checkout tags/v2021-02-20-01
-make base
+git checkout e0d4742-dynamic_load
+
+# clone free5gc v3.0.6
+cd base
+git clone --recursive -b v3.0.6 -j `nproc` https://github.com/free5gc/free5gc.git
+
+# replace smf with dynamic-load version
+cd free5gc/NFs
+rm -Rf smf
+git clone git@github.ibm.com:WEIT/smf.git
+cd smf
+git checkout dynamic_load
+
+# Build the images
+cd ~/free5gc-compose
+make all
 docker-compose build
 ```
 
@@ -194,15 +215,17 @@ docker-compose build
 Ensure to properly tag the images built from the previous step - into the below names
 
 ```
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udr
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nssf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-amf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nrf
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udr:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:v3.0.6-dynamic-load
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf-ext:v3.0.6-dynamic-load
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nssf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-amf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nrf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf:v3.0.6
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-webui:v3.0.6
 ```
 
 then push them with `docker push ...`
@@ -210,7 +233,7 @@ then push them with `docker push ...`
 ### Install additional tools into UPF
 
 ```
-docker build --tag docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf-tools --force-rm=true -f ./Dockerfile.upf .
+docker build --tag docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf-tools:v3.0.6 --force-rm=true -f ./Dockerfile.upf .
 ```
 
 then push it with `docker push ...`
@@ -238,7 +261,7 @@ Do this for both gNB and UE VMs
 cd ~
 git clone https://github.com/aligungr/UERANSIM.git
 cd UERANSIM
-git checkout tags/v3.2.0 -b v3.2.0-branch
+git checkout tags/v3.2.5 -b v3.2.5-branch
 ```
 
 ### Install UERANSIM
@@ -343,22 +366,31 @@ login with `admin/free5gc`
 
 New subscriber -> accept all defaults -> Submit  
 
+### Add UE into topology group
+
+Add the ue into proper topology group slice.
+
+Run the below to add `imsi-208930000000003` into `1-010203`
+
+```
+curl -X POST http://<core cluster master ipaddress>:<smf-ext-nodeport>/ue-routes/1-010203/members/imsi-208930000000003
+```
 
 ### **Deploy subnet slice** (010203)
 
 Log into ACM hub cluster
-
-deploy subnet on the blue namespace
-
-```
-kubectl create ns blue
-```
 
 ```
 argo -n domain-operator-b  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch
 ```
 
 wait for the flow to complete
+
+**NOTE:** to delete a given subnetslice invoke the below setting `fiveg_subnet_id` to its proper value
+
+```bash
+argo -n domain-operator-b  submit workflows/argo-acm/fiveg-subnet-delete.yaml -p fiveg_subnet_id="fiveg-subnet-lx29w" --watch
+```
 
 ### Connect UE to slice
 
@@ -374,7 +406,7 @@ Customize free5gc-ue.yaml to use slice 010203
  # List of gNB IP addresses for Radio Link Simulation
  gnbSearchList:
 -  - 127.0.0.1
-+  - 172.15.0.211
++  - 192.168.1.133
 
  # Initial PDU sessions to be established
  sessions:
@@ -383,7 +415,6 @@ Customize free5gc-ue.yaml to use slice 010203
  default-nssai:
    - sst: 1
 -    sd: 1
-+    sd: 010203
 
  # Supported encryption algorithms by this UE
  integrity:

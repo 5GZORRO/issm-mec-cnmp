@@ -1,4 +1,4 @@
-# Copyright 2021 – 2022 IBM Corporation
+# Copyright 2021 - 2022 IBM Corporation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,68 +23,293 @@ metadata:
 spec:
   templates:
   - name: handlerequest
+    steps:
+    - - name: handle-create
+        template: handlecreate
+        when: "{{workflow.parameters.operation}} == \"create\""
+
+    - - name: handle-delete
+        template: handledelete
+        when: "{{workflow.parameters.operation}} == \"delete\""
+
+  - name: handlecreate
     dag:
       tasks:
-      - name: smf-add-node
-        templateRef:
-          name: nf-template
-          template: create-tr
-        arguments:
-          parameters:
-          - name: nf_apiversion
-            value: "5g.ibm.com/v1alpha1"
-          - name: nf_kind
-            value: Transition
-          - name: nf_name
-            value: "smf-addnode-{{workflow.name}}"
-          - name: nf_spec
-            value: |
-              {
-                "config": {
-                  "resourceType": "smfs.v1alpha1.5g.ibm.com",
-                  "resourceNamespace": "{{workflow.parameters.core_namespace}}",
-                  "resourceName": "{{workflow.parameters.smf_name}}",
-                  "transition": "AttachNode",
-                  "properties": {
-                    # svc name or ip in sbi network
-                    "nodeIdSbi": "{{workflow.parameters.upf_sbi}}",
-                    # svc name or ip in up network
-                    "nodeIdUp": "{{workflow.parameters.upf_up}}",
-                    # for smf its a logical name of this upf to maintain map
-                    # between it and its ip, slice id
-                    "nodeName": "upf-{{workflow.name}}",
-                    "nodeType": "UPF",
-                    "sd": "{{workflow.parameters.sd}}",
-                    "sst": "{{workflow.parameters.sst}}"
-                  }
-                }
-              }
+      - name: smf-register-upf
+        template: smf-register-upf
 
-      - name: smf-add-link
-        templateRef:
-          name: nf-template
-          template: create-tr
-        arguments:
-          parameters:
-          - name: nf_apiversion
-            value: "5g.ibm.com/v1alpha1"
-          - name: nf_kind
-            value: Transition
-          - name: nf_name
-            value: "smf-addlink-{{workflow.name}}"
-          - name: nf_spec
-            value: |
-              {
-                "config": {
-                  "resourceType": "smfs.v1alpha1.5g.ibm.com",
-                  "resourceNamespace": "{{workflow.parameters.core_namespace}}",
-                  "resourceName": "{{workflow.parameters.smf_name}}",
-                  "transition": "AddLink",
-                  "properties": {
-                    "nodeId": "gNB",
-                    # for smf its a logical name of this upf to maintain map
-                    # between it and its ip, slice id
-                    "connectedTo": "upf-{{workflow.name}}"
-                  }
+      - name: smf-topology-upf
+        template: smf-default-topology-upf
+
+  - name: handledelete
+    dag:
+      tasks:
+      - name: smf-register-upf-delete
+        template: smf-register-upf-delete
+
+      - name: smf-topology-upf-delete
+        template: smf-default-topology-upf-delete
+
+  - name: smf-register-upf
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        def raise_for_status(r):
+            http_error_msg = ''
+            if 400 <= r.status_code < 500:
+                http_error_msg = '%s Client Error: %s' % (r.status_code, r.reason)
+
+            elif 500 <= r.status_code < 600:
+                http_error_msg = '%s Server Error: %s' % (r.status_code, r.reason)
+
+            return http_error_msg
+
+        core_namespace = "{{workflow.parameters.core_namespace}}"
+        smf_name = "{{workflow.parameters.smf_name}}"
+        payload = {
+          "up_nodes": {
+            "{{workflow.parameters.fiveg_subnet_id}}": {
+              "type": "UPF",
+              "node_id": "{{workflow.parameters.upf_sbi}}",
+              "sNssaiUpfInfos": [
+                {
+                  "sNssai": {
+                    "sst": int("{{workflow.parameters.sst}}"),
+                    "sd": "{{workflow.parameters.sd}}"
+                  },
+                  "dnnUpfInfoList": [
+                    {
+                      "dnn": "internet"
+                    }
+                  ]
                 }
-              }
+              ],
+              "interfaces": [
+                {
+                  "interfaceType": "N3",
+                  "endpoints": ["{{workflow.parameters.upf_up}}"],
+                  "networkInstance": "internet"
+                },
+                {
+                  "interfaceType": "N9",
+                  "endpoints": ["{{workflow.parameters.upf_up}}"],
+                  "networkInstance": "internet"
+                }
+              ]
+            }
+          }
+        }
+
+        pool = "{{workflow.parameters.pool}}"
+        if pool != "0.0.0.0/16":
+            sys.stdout.write('Add pool [%s]\n' % pool)
+            # NOTE: UPF is related to a single slice
+            payload["up_nodes"]["{{workflow.parameters.fiveg_subnet_id}}"]["sNssaiUpfInfos"][0]["dnnUpfInfoList"][0]["pools"] = [{"cidr": "{{workflow.parameters.pool}}"}]
+
+        headers = {'Content-Type': 'application/json'}
+        r= requests.post('http://%s.%s:8000/upi/v1/upf' % (smf_name, core_namespace),
+            json=payload,
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+  - name: smf-topology-upf
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        def raise_for_status(r):
+            http_error_msg = ''
+            if 400 <= r.status_code < 500:
+                http_error_msg = '%s Client Error: %s' % (r.status_code, r.reason)
+
+            elif 500 <= r.status_code < 600:
+                http_error_msg = '%s Server Error: %s' % (r.status_code, r.reason)
+
+            return http_error_msg
+
+        upf_name = "{{workflow.parameters.fiveg_subnet_id}}"
+        core_namespace = "{{workflow.parameters.core_namespace}}"
+        smf_name = "{{workflow.parameters.smf_name}}"
+        group = "{{workflow.parameters.sst}}-{{workflow.parameters.sd}}"
+        connectedFrom = "{{workflow.parameters.connectedFrom}}"
+        sys.stdout.write('Input parameters. upf_name: "%s", core_namespace: "%s", smf_name: "%s", group: "%s", connectedFrom: "%s"\n'
+                          % (upf_name, core_namespace, smf_name, group, connectedFrom))
+        payload = {
+            "A": connectedFrom,
+            "B": upf_name
+        }
+
+        headers = {'Content-Type': 'application/json'}
+        r= requests.put('http://%s.%s:8080/ue-routes/%s/topology' % (smf_name, core_namespace, group),
+            json=payload,
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+
+  - name: smf-default-topology-upf
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        def raise_for_status(r):
+            http_error_msg = ''
+            if 400 <= r.status_code < 500:
+                http_error_msg = '%s Client Error: %s' % (r.status_code, r.reason)
+
+            elif 500 <= r.status_code < 600:
+                http_error_msg = '%s Server Error: %s' % (r.status_code, r.reason)
+
+            return http_error_msg
+
+        upf_name = "{{workflow.parameters.fiveg_subnet_id}}"
+        core_namespace = "{{workflow.parameters.core_namespace}}"
+        smf_name = "{{workflow.parameters.smf_name}}"
+        connectedFrom = "{{workflow.parameters.connectedFrom}}"
+        sys.stdout.write('Input parameters. upf_name: "%s", core_namespace: "%s", smf_name: "%s", connectedFrom: "%s"\n'
+                          % (upf_name, core_namespace, smf_name, connectedFrom))
+        payload = {
+            "A": connectedFrom,
+            "B": upf_name
+        }
+
+        headers = {'Content-Type': 'application/json'}
+        r= requests.put('http://%s.%s:8080/links' % (smf_name, core_namespace),
+            json=payload,
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+
+  - name: smf-register-upf-delete
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        def raise_for_status(r):
+            http_error_msg = ''
+            if 400 <= r.status_code < 500:
+                http_error_msg = '%s Client Error: %s' % (r.status_code, r.reason)
+
+            elif 500 <= r.status_code < 600:
+                http_error_msg = '%s Server Error: %s' % (r.status_code, r.reason)
+
+            return http_error_msg
+
+        core_namespace = "{{workflow.parameters.core_namespace}}"
+        smf_name = "{{workflow.parameters.smf_name}}"
+        upf_name = "{{workflow.parameters.fiveg_subnet_id}}"
+
+        headers = {'Content-Type': 'application/json'}
+        r= requests.delete('http://%s.%s:8000/upi/v1/upf/%s' % (smf_name, core_namespace, upf_name),
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+  - name: smf-topology-upf-delete
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        def raise_for_status(r):
+            http_error_msg = ''
+            if 400 <= r.status_code < 500:
+                http_error_msg = '%s Client Error: %s' % (r.status_code, r.reason)
+
+            elif 500 <= r.status_code < 600:
+                http_error_msg = '%s Server Error: %s' % (r.status_code, r.reason)
+
+            return http_error_msg
+
+        upf_name = "{{workflow.parameters.fiveg_subnet_id}}"
+        core_namespace = "{{workflow.parameters.core_namespace}}"
+        smf_name = "{{workflow.parameters.smf_name}}"
+        sst = "{{workflow.parameters.sst}}"
+        sd = "{{workflow.parameters.sd}}"
+        # both retrieved from jq which appends '/n'
+        sst = sst.strip()
+        sd = sd.strip()
+
+        group = "%s-%s" % (sst, sd)
+
+        sys.stdout.write('Input parameters. upf_name: "%s", core_namespace: "%s", smf_name: "%s", group: "%s" \n'
+                          % (upf_name, core_namespace, smf_name, group))
+
+        headers = {'Content-Type': 'application/json'}
+        r= requests.delete('http://%s.%s:8080/ue-routes/%s/topology/%s' % (smf_name, core_namespace, group, upf_name),
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))
+
+
+  - name: smf-default-topology-upf-delete
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import requests
+        import sys
+
+        def raise_for_status(r):
+            http_error_msg = ''
+            if 400 <= r.status_code < 500:
+                http_error_msg = '%s Client Error: %s' % (r.status_code, r.reason)
+
+            elif 500 <= r.status_code < 600:
+                http_error_msg = '%s Server Error: %s' % (r.status_code, r.reason)
+
+            return http_error_msg
+
+        upf_name = "{{workflow.parameters.fiveg_subnet_id}}"
+        core_namespace = "{{workflow.parameters.core_namespace}}"
+        smf_name = "{{workflow.parameters.smf_name}}"
+
+        sys.stdout.write('Input parameters. upf_name: "%s", core_namespace: "%s", smf_name: "%s" \n'
+                          % (upf_name, core_namespace, smf_name))
+
+        headers = {'Content-Type': 'application/json'}
+        r= requests.delete('http://%s.%s:8080/links/%s' % (smf_name, core_namespace, upf_name),
+            headers=headers)
+        sys.stdout.write('r.text [%s]\n' % r.text)
+        error_msg = raise_for_status(r)
+        if error_msg:
+            raise Exception('%s. %s' % (error_msg, r.text))

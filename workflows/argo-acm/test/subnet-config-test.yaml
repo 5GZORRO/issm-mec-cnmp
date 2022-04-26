@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: fiveg-subnet-config-test-
+spec:
+  entrypoint: handlerequest
+  workflowTemplateRef:
+    name: fiveg-subnet-configure
+  arguments:
+    parameters:
+    - name: core_namespace
+      value: domain-operator-a
+
+    - name: smf_name
+      value: "smf-sample"
+
+    - name: sst
+      value: 1
+    - name: sd
+      value: "010203"
+
+    - name: pool
+      value: "0.0.0.0/16"
+
+    - name: connectedFrom
+      value: gNB
+
+    - name: group
+      value: blue
+
+    - name: upf_sbi
+      value: "1.2.3.4"
+
+    - name: upf_up
+      value: "5.6.7.8"
+      
