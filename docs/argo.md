@@ -49,6 +49,10 @@ argo logs @latest
 
 ### Argo UI
 
+Two options to access Argo UI.
+
+**One:**
+
 In a different terminal, log into kubernetes master and invoke the below to start the UI
 
 ```
@@ -56,6 +60,14 @@ argo server
 ```
 
 Ensure you can access the UI by browsing `http://localhost:2746`
+
+**Second:**
+
+Argo server is automatically installed and is internally available within kubernetes
+
+Expose argo-server externally via these [instructions](https://argoproj.github.io/argo-workflows/argo-server/#expose-a-loadbalancer): `kubectl patch svc argo-server -n argo -p '{"spec": {"type": "LoadBalancer"}}'`
+
+Ensure you can access the UI by browsing `http://<k8s master node>:<external port mapped to 2746>`
 
 # argo-events
 
