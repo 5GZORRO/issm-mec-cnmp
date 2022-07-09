@@ -36,14 +36,3 @@ restart docker
 service docker stop
 service docker start
 ```
-
-## Copy images into registry
-
-Update `ansible/inventory.yaml` accordingly
-
-**Tip:** you may need to update [main.yaml](../ansible/roles/xnfs/tasks/main.yaml) with proper `origin` and `target`
-
-```
-cd ~/issm-mec-cnmp/ansible
-ansible-playbook -i inventory.yaml entrypoint.yaml
-```
