@@ -1,23 +1,25 @@
 # issm-mec-cnmp
 
+## Introduction
+
 The goal of the platform is to deploy 5G slices natively on K8s in a multi-cluster environment to allow K8s native applications to consume 5G networking directly in the K8s clusters serving as NFVI. The design is VIM-less. Both slice and applications are treated as K8s native services. Kubernitized free5GC is used as a running example to illustrate the concepts. Distributed NFVI is managed via [Open Cluster Management](https://open-cluster-management.io/) open source project. The management workflows are implemented as [Argo](https://github.com/argoproj/argo-workflows) templatized workflows. Informally, the workflows are of two kinds: local and global. The former ones execute autonomously in a specific NFVI (K8s cluster) and the global ones span different NFVIs and the management hub cluster. When synchronization of any kind is required among the local workflows (perhaps being part of a global one), synchronization and parameter passing is done via message passing using [Kafka message bus](https://kafka.apache.org/) in the management hub cluster. Architecturally, the management hub cluster is located in Core and represents MEC System, while other K8s clusters (NFVI) are located in Edge (RAN) and Transport.
 
-# issm-mec-cnmp
+![Testbed](images/multi-cluster-zorro-bluered.png)
 
-Use [these instructions](docs/kubernetes.md) to deploy three kubernetes clusters
+## System Requirements
+
+Use [these instructions](docs/kubernetes.md) to deploy three kubernetes clusters each with master/worker installed with a VM of Ubuntu 20.04 allocated with 2vCPUs, 8GB RAM and 100 GB disk
 
 * OCM Hub: 1 master, 1 worker
 * Core: 1 master, 2 workers
 * Edge: 1 master, 1 worker
 
-Create two fresh **Ubuntu 20.04** VMs: 4 vCPU, 8 GB RAM, 50 GB for
+Create two fresh Ubuntu 20.04 VMs allocated with 4 vCPU, 8 GB RAM and 50 GB
 
 * gNB node
 * UE (user-equipment)
 
 **Important**: ensure VMs network interfaces set with the same name e.g. `ens3`
-
-![Testbed](images/multi-cluster-zorro-bluered.png)
 
 ## Open Cluster Manager
 
@@ -290,7 +292,7 @@ make
 
 Perform the below before the deployment
 
-Log into ACM hub cluster
+Log into OCM hub cluster
 
 Configure the git-subscription channel to point to fiveg packages github
 
@@ -303,7 +305,7 @@ kubectl apply -f workflows/argo-acm/remote-git-sub/02-channel.yaml
 
 Kick off free5gc core deployment
 
-Log into ACM hub cluster
+Log into OCM hub cluster
 
 ```
 cd ~/issm-mec-cnmp
@@ -378,7 +380,7 @@ curl -X POST http://<core cluster master ipaddress>:<smf-ext-nodeport>/ue-routes
 
 ### **Deploy subnet slice** (010203)
 
-Log into ACM hub cluster
+Log into OCM hub cluster
 
 ```
 argo -n domain-operator-b  submit workflows/argo-acm/fiveg-subnet.yaml --parameter-file workflows/argo-acm/subnet-010203.json --watch
@@ -433,6 +435,11 @@ Open another terminal on UE VM and perform the below to transfer data over this 
 ```
 curl --interface uesimtun0 google.com
 ```
+
+## Maintainers
+**Avi Weit** - weit@il.ibm.com
+
+**David Breitgand** - davidbr@il.ibm.com
 
 ## Licensing
 
