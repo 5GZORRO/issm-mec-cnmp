@@ -189,9 +189,9 @@ Log into host installed with docker and has access to docker.pkg.github.com
 ```
 # Clone free5gc-compose project
 cd ~
-git clone git@github.ibm.com:WEIT/free5gc-compose.git
+git clone https://github.com/5GZORRO/free5gc-compose.git
 cd free5gc-compose
-git checkout e0d4742-dynamic_load
+git checkout free5gc-compose-e0d4742-nf_build
 
 # clone free5gc v3.0.6
 cd base
@@ -200,9 +200,9 @@ git clone --recursive -b v3.0.6 -j `nproc` https://github.com/free5gc/free5gc.gi
 # replace smf with dynamic-load version
 cd free5gc/NFs
 rm -Rf smf
-git clone git@github.ibm.com:WEIT/smf.git
+git clone https://github.com/5GZORRO/free5gc-smf.git
 cd smf
-git checkout dynamic_load
+git checkout smf-46644f0-dynamic-load
 
 # Build the images
 cd ~/free5gc-compose
