@@ -219,8 +219,8 @@ Ensure to properly tag the images built from the previous step - into the below 
 ```
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udr:v3.0.6
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:v3.0.6-dynamic-load
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf-ext:v3.0.6-dynamic-load
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:v3.0.6-dynamic-load-2a0e447
+docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf-ext:v3.0.6-dynamic-load-c6fee5a
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf:v3.0.6
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nssf:v3.0.6
 docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf:v3.0.6
