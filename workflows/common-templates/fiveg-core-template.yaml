@@ -289,8 +289,13 @@ spec:
                   "nrf_ip_address": "nrf-sample-sbi",
                   "nrf_port": "8000",
                   up_nodes: [
-                    { "name": "gNB",
-                      "type": "AN"
+                    { "name": "gNB1",
+                      "type": "AN",
+                      "nrCellId": "000000010"
+                    },
+                    { "name": "gNB2",
+                      "type": "AN",
+                      "nrCellId": "000000020"
                     }
                   ]
                 }
