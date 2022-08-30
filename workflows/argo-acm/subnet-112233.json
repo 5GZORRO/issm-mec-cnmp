@@ -10,7 +10,7 @@
     "sd": "112233",
 
     "pool": "60.62.0.0/16",
-    "connectedFrom": "gNB",
+    "connectedFrom": "gNB1",
 
     "network_name": "gilan",
     "network_master": "ens3",

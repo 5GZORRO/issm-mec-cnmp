@@ -127,7 +127,7 @@ curl -X POST \
   "sst": "1",
   "sd": "010203",
   "pool": "60.61.0.0/16",
-  "connectedFrom": "gNB",
+  "connectedFrom": "gNB1",
   "networks": [
     {
         "name": "sbi", "master": "ens3", "range": "10.100.200.0/24",
@@ -162,7 +162,7 @@ curl -X POST \
   "sst": "1",
   "sd": "112233",
   "pool": "60.62.0.0/16",
-  "connectedFrom": "gNB",
+  "connectedFrom": "gNB1",
   "network_name": "gilan",
   "network_master": "ens3",
   "network_range": "10.20.0.0/24",

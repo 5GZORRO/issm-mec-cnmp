@@ -73,10 +73,10 @@ spec:
         core_namespace = "{{workflow.parameters.core_namespace}}"
         smf_name = "{{workflow.parameters.smf_name}}"
         payload = {
-          "up_nodes": {
+          "upNodes": {
             "{{workflow.parameters.fiveg_subnet_id}}": {
               "type": "UPF",
-              "node_id": "{{workflow.parameters.upf_sbi}}",
+              "nodeId": "{{workflow.parameters.upf_sbi}}",
               "sNssaiUpfInfos": [
                 {
                   "sNssai": {
@@ -110,7 +110,7 @@ spec:
         if pool != "0.0.0.0/16":
             sys.stdout.write('Add pool [%s]\n' % pool)
             # NOTE: UPF is related to a single slice
-            payload["up_nodes"]["{{workflow.parameters.fiveg_subnet_id}}"]["sNssaiUpfInfos"][0]["dnnUpfInfoList"][0]["pools"] = [{"cidr": "{{workflow.parameters.pool}}"}]
+            payload["upNodes"]["{{workflow.parameters.fiveg_subnet_id}}"]["sNssaiUpfInfos"][0]["dnnUpfInfoList"][0]["pools"] = [{"cidr": "{{workflow.parameters.pool}}"}]
 
         headers = {'Content-Type': 'application/json'}
         r= requests.post('http://%s.%s:8000/upi/v1/upf' % (smf_name, core_namespace),

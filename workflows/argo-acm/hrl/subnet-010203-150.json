@@ -10,7 +10,7 @@
     "sd": "010203",
 
     "pool": "60.68.0.0/16",
-    "connectedFrom": "gNB",
+    "connectedFrom": "gNB1",
 
     "networks": [
         {
