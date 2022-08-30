@@ -132,7 +132,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "upf_name": "{{workflow.parameters.fiveg_subnet_id}}",
                   "data_network_name": "{{workflow.parameters.network_name}}",
@@ -172,7 +172,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "upf_name": "{{workflow.parameters.fiveg_subnet_id}}",
                   "data_network_name": "{{workflow.parameters.network_name}}",
@@ -209,7 +209,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "upf_name": "{{workflow.parameters.fiveg_subnet_id}}",
                   "dnns": [
@@ -247,7 +247,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf-tools:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-upf:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "upf_name": "{{workflow.parameters.fiveg_subnet_id}}",
                   "elicensing": {

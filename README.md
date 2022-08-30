@@ -189,25 +189,36 @@ Log into host installed with docker and has access to docker.pkg.github.com
 ```
 # Clone free5gc-compose project
 cd ~
-git clone https://github.com/5GZORRO/free5gc-compose.git
+git clone git@github.ibm.com:WEIT/free5gc-compose.git
 cd free5gc-compose
-git checkout free5gc-compose-e0d4742-nf_build
+git checkout e762f48-nf_build_upfs-dynamic_load-multilpe_gnbs-tls_volume
 
-# clone free5gc v3.0.6
+# clone free5gc v3.1.1
 cd base
-git clone --recursive -b v3.0.6 -j `nproc` https://github.com/free5gc/free5gc.git
+git clone --recursive -b v3.1.1 -j `nproc` https://github.com/free5gc/free5gc.git
 
-# replace smf with dynamic-load version
+# replace smf
 cd free5gc/NFs
 rm -Rf smf
-git clone https://github.com/5GZORRO/free5gc-smf.git
+git clone git@github.ibm.com:WEIT/smf.git
 cd smf
-git checkout smf-46644f0-dynamic-load
+git checkout smf-84c979a-dynamic_load-multiple_gnbs
+
+# replace amf
+cd ~/free5gc-compose/base/free5gc/NFs
+rm -Rf amf
+git clone git@github.ibm.com:WEIT/amf.git
+cd amf
+git checkout amf-03f9848-uelocation
 
 # Build the images
 cd ~/free5gc-compose
-make all
-docker-compose build
+
+# copy additional SMF build files
+nf_smf-ext/copy.sh
+
+sudo make all
+sudo docker-compose build
 ```
 
 ### Tag and Push to registry
@@ -217,28 +228,24 @@ docker-compose build
 Ensure to properly tag the images built from the previous step - into the below names
 
 ```
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udr:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:v3.0.6-dynamic-load-2a0e447
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf-ext:v3.0.6-dynamic-load-c6fee5a
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nssf:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-amf:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nrf:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf:v3.0.6
-docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-webui:v3.0.6
+sudo docker tag free5gc-compose_free5gc-udm docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm:v3.1.1-tls
+sudo docker tag free5gc-compose_free5gc-smf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:v3.1.1-tls
+sudo docker tag free5gc-compose_free5gc-pcf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf:v3.1.1-tls
+
+# Updated AMF, SMF
+sudo docker tag free5gc-compose_free5gc-amf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-amf:2443f63-tls
+sudo docker tag free5gc-compose_free5gc-smf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:1399ff7-tls
+sudo docker tag free5gc-compose_free5gc-smf-ext docker.pkg.github.com/5gzorro/issm-mec-cnmp/weit/free5gc-smf-ext:1399ff7-tls
+
+sudo docker tag free5gc-compose_free5gc-nrf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nrf:v3.1.1-tls
+sudo docker tag free5gc-compose_free5gc-ausf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf:v3.1.1-tls
+sudo docker tag free5gc-compose_free5gc-nssf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nssf:v3.1.1-tls
+sudo docker tag free5gc-compose_free5gc-webui docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-webui:v3.1.1-tls
+
+sudo docker tag free5gc-compose_free5gc-upf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf:v3.1.1-tls
 ```
 
 then push them with `docker push ...`
-
-### Install additional tools into UPF
-
-```
-docker build --tag docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-upf-tools:v3.0.6 --force-rm=true -f ./Dockerfile.upf .
-```
-
-then push it with `docker push ...`
 
 
 ### Private registry

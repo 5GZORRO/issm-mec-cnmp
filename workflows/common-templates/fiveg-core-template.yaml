@@ -86,7 +86,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nrf:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nrf:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "nrf_name": "nrf-sample",
                   "mnc": "93",
@@ -115,7 +115,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udr:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udr:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "udr_name": "udr-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -143,7 +143,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udm:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-udm:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "udm_name": "udm-sample",
                   "nrf_ip_address": "nrf-sample-sbi"
@@ -169,7 +169,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-ausf:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-ausf:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "ausf_name": "ausf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -196,7 +196,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nssf:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-nssf:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "nssf_name": "nssf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -225,7 +225,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-amf:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-amf:2443f63-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "amf_name": "amf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -254,7 +254,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-pcf:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-pcf:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "pcf_name": "pcf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -282,8 +282,8 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf:v3.0.6-dynamic-load-2a0e447",
-                  "image_ext": "{{workflow.parameters.registry}}/weit/free5gc-smf-ext:v3.0.6-dynamic-load-c6fee5a",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-smf:1399ff7-tls",
+                  "image_ext": "{{workflow.parameters.registry}}/weit/free5gc-smf-ext:1399ff7-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "smf_name": "smf-sample",
                   "nrf_ip_address": "nrf-sample-sbi",
@@ -323,7 +323,7 @@ spec:
             value: |
               {
                 "config": {
-                  "image": "{{workflow.parameters.registry}}/weit/free5gc-webui:v3.0.6",
+                  "image": "{{workflow.parameters.registry}}/weit/free5gc-webui:v3.1.1-tls",
                   "image_init": "{{workflow.parameters.registry}}/weit/5ginitcontainer",
                   "mongo_ip_address": "mongo-sample-sbi"
                   }
