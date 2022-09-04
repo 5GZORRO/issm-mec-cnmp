@@ -334,6 +334,7 @@ spec:
                   }
               }
 
+      # Example using a start/end range
       - name: subscribe-ues
         dependencies: [create-webconsole, create-smf]
         templateRef:
@@ -346,10 +347,32 @@ spec:
             value: webconsole
           - name: core_namespace
             value: "{{workflow.namespace}}"
-          - name: supi
-            value: imsi-208930000000003
-          - name: plmn
-            value: 20893
+          - name: mnc
+            value: "93"
+          - name: mcc
+            value: "208"
+          - name: supi_idx
+            value: "{{item}}"
+        withSequence:
+          start: "3"
+          end: "8"
+
+#      - name: subscribe-ues
+#        dependencies: [create-webconsole, create-smf]
+#        templateRef:
+#          name: workflow-subscribe
+#          template: subscribe
+#        arguments:
+#          parameters:
+#          - name: webconsole_name
+#            # service name
+#            value: webconsole
+#          - name: core_namespace
+#            value: "{{workflow.namespace}}"
+#          - name: supi
+#            value: imsi-208930000000003
+#          - name: plmn
+#            value: 20893
 
 
   - name: register-ues

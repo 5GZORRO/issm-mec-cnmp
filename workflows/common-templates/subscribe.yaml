@@ -9,8 +9,9 @@ spec:
       parameters:
       - name: webconsole_name
       - name: core_namespace
-      - name: supi
-      - name: plmn
+      - name: supi_idx
+      - name: mnc
+      - name: mcc
     script:
       image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
       imagePullPolicy: IfNotPresent
@@ -23,8 +24,9 @@ spec:
         webconsole_name = "{{inputs.parameters.webconsole_name}}"
         core_namespace = "{{inputs.parameters.core_namespace}}"
 
-        supi = "{{inputs.parameters.supi}}"
-        plmn = "{{inputs.parameters.plmn}}"
+        supi_idx = "{{inputs.parameters.supi_idx}}"
+        mnc = "{{inputs.parameters.mnc}}"
+        mcc = "{{inputs.parameters.mcc}}"
 
         def raise_for_status(r):
             http_error_msg = ''
@@ -38,8 +40,8 @@ spec:
 
 
         payload = {
-            "plmnID": "%s" % plmn,
-            "ueId": "%s" % supi,
+            "plmnID": "%s%s" % (mcc, mnc),
+            "ueId": "imsi-%s%s000000000%s" % (mcc, mnc, supi_idx),
             "AuthenticationSubscription": {
               "authenticationMethod": "5G_AKA",
               "permanentKey": {
@@ -276,6 +278,9 @@ spec:
             },
             "FlowRules": None
           }
+
+        plmn = payload['plmnID']
+        supi = payload['ueId']
 
         #curl -v http://172.15.0.150:30050/api/subscriber/imsi-208930000000003/20893 -H "Token: admin"
         headers = {'Content-Type': 'application/json', 'Token': 'admin'}
