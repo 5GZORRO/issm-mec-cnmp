@@ -65,7 +65,7 @@ spec:
                 "core_namespace": "domain-operator-a",
                 "sst": "1",
                 "sd": "010203",
-                "connectedFrom": "gNB",
+                "connectedFrom": "gNB1",
                 "networks": {{workflow.parameters.cluster-150-network-spec}}
               }
 
