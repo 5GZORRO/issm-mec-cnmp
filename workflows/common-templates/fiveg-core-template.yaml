@@ -334,6 +334,24 @@ spec:
                   }
               }
 
+      - name: subscribe-ues
+        dependencies: [create-webconsole, create-smf]
+        templateRef:
+          name: workflow-subscribe
+          template: subscribe
+        arguments:
+          parameters:
+          - name: webconsole_name
+            # service name
+            value: webconsole
+          - name: core_namespace
+            value: "{{workflow.namespace}}"
+          - name: supi
+            value: imsi-208930000000003
+          - name: plmn
+            value: 20893
+
+
   - name: register-ues
     inputs:
       parameters:
