@@ -182,8 +182,6 @@ Refer [here](./5ginitcontainer) for more details
 
 Log into host installed with docker and has access to docker.pkg.github.com
 
-**Note:** ensure to build images out from free5gc `v3.0.6` and the dynamic-load version of smf
-
 ### Build
 
 ```
@@ -229,13 +227,12 @@ Ensure to properly tag the images built from the previous step - into the below 
 
 ```
 sudo docker tag free5gc-compose_free5gc-udm docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-udm:v3.1.1-tls
-sudo docker tag free5gc-compose_free5gc-smf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:v3.1.1-tls
 sudo docker tag free5gc-compose_free5gc-pcf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-pcf:v3.1.1-tls
 
 # Updated AMF, SMF
 sudo docker tag free5gc-compose_free5gc-amf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-amf:2443f63-tls
 sudo docker tag free5gc-compose_free5gc-smf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf:1399ff7-tls
-sudo docker tag free5gc-compose_free5gc-smf-ext docker.pkg.github.com/5gzorro/issm-mec-cnmp/weit/free5gc-smf-ext:1399ff7-tls
+sudo docker tag free5gc-compose_free5gc-smf-ext docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-smf-ext:1399ff7-tls
 
 sudo docker tag free5gc-compose_free5gc-nrf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-nrf:v3.1.1-tls
 sudo docker tag free5gc-compose_free5gc-ausf docker.pkg.github.com/5gzorro/issm-mec-cnmp/free5gc-ausf:v3.1.1-tls

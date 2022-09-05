@@ -39,6 +39,8 @@ make manifests
 make deploy
 ```
 
+**Note:** install gcc (`sudo apt-get install gcc`) incase you encounter the bellow error for `make generate`: `/usr/local/go/src/net/cgo_linux.go:12:8: no such package located`
+
 Wait for controller pod to start
 
 ```

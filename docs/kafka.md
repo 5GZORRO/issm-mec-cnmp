@@ -8,9 +8,14 @@ The below instructions are taken from [kafka-docker readme](https://github.com/w
 
 ## Install
 
-### docker-compose
+### docker-compose v1.29.2
 
 Install docker-compose via: https://docs.docker.com/compose/install/
+
+```
+sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
 
 ### kafka broker
 
