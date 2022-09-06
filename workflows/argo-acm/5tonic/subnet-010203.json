@@ -1,0 +1,33 @@
+{
+    "registry": "10.4.2.227:5000",
+    "kafka_ip": "10.4.2.227",
+
+    "cluster": "cluster-2",
+    "cluster_core": "cluster-1",
+    "smf_name": "smf-sample",
+    "core_namespace": "domain-operator-a",
+    "sst": "1",
+    "sd": "010203",
+
+    "pool": "60.61.0.0/16",
+    "connectedFrom": "gNB1",
+
+    "networks": [
+        {
+            "name": "sbi",
+            "master": "ens3",
+            "range": "10.100.200.0/24",
+            "start": "10.100.200.21",
+            "end": "10.100.200.40"
+        },
+        {
+            "name": "up",
+            "master": "ens3",
+            "range": "10.4.2.0/24",
+            "start": "10.4.2.251",
+            "end": "10.4.2.253"
+        }
+    ],
+    "elma_url": "http://172.28.3.42:31880",
+    "product_id": "EEyymp33AzSYHZFwvT8Bvp"
+}
