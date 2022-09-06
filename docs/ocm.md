@@ -12,16 +12,17 @@ Install CLI on both hub and clusters to be managed
 
 ```
 cd ~
-wget https://github.com/open-cluster-management-io/clusteradm/releases/download/v0.1.0-alpha.5/clusteradm_linux_amd64.tar.gz
-tar xzvf clusteradm_linux_amd64.tar.gz
+curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
 ```
 
 ## Deploy a cluster manager on your hub cluster
 
-invoke
+Log into kubernetes **hub** cluster
+
+invoke with --use-bootstrap-token (for v1.19.x k8s cluster)
 
 ```
-clusteradm init
+clusteradm init --wait --use-bootstrap-token
 ```
 
 copy the generated command and replace "managed cluster name" with e.g. `cluster-1`.
@@ -29,7 +30,6 @@ copy the generated command and replace "managed cluster name" with e.g. `cluster
 ### Deploy a klusterlet agent
 
 Log into kubernetes **managed** cluster
-
 
 and invoke previously join command appending the context of your managed cluster
 
@@ -69,7 +69,7 @@ verify it has true in all corresponding values
 
 In order to place workloads into this cluster, you need to label it with its name
 
-Log into kubernetes hub cluster
+Log into kubernetes **hub** cluster
 
 ```
 kubectl label managedclusters/cluster-1 name=cluster-1 --overwrite
@@ -108,7 +108,7 @@ kubectl get pod -n open-cluster-management
 
 **Important:**
  
-If multicloud-operators-channel deployment pod endters CrashLoopBackOff, edit the deployment to use image tag of: `v0.4.0`. Pod automatically refreshes with new image
+If multicloud-operators-channel deployment pod enters CrashLoopBackOff, edit the deployment to use image tag of: `v0.4.0`. Pod automatically refreshes with new image
 
 
 ### Create agent namespace

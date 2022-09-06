@@ -90,6 +90,13 @@ Do this for all three clusters: hub, core and edge clusters
 Have Argo to run free5gc workflows under `domain-operator-a` , `domain-operator-b`, `domain-operator-c`, namespaces.
 
 ```
+cd ~
+git clone https://github.com/5GZORRO/issm-mec-cnmp.git
+cd issm-mec-cnmp
+git checkout free5gc-v3.1.1
+```
+
+```
 # operator-a
 export NAMESPACE=domain-operator-a
 kubectl create namespace $NAMESPACE
