@@ -87,5 +87,13 @@ spec:
                 value: |
                   {{workflow.parameters.networks}}
 
+              - name: kafka_ip
+                value: "{{workflow.parameters.kafka_ip}}"
+              - name: kafka_port
+                value: "{{workflow.parameters.kafka_port}}"
+
+              - name: topic
+                value: "{{workflow.parameters.cluster}}"
+
               - name: msg_id
                 value: "deploy-{{workflow.name}}"
