@@ -80,7 +80,9 @@ spec:
 
       - name: wait-for-subnet-status
         dependencies: [create-subnet-deploy-subscription]
-        template: consume
+        templateRef:
+          name: workflow-base
+          template: consume
         arguments:
           parameters:
           - name: kafka_ip
@@ -92,15 +94,42 @@ spec:
           - name: msg_id
             value: "deploy-{{workflow.name}}"
 
-      - name: create-subnet-configure-subscription
+      - name: get-sbi-ip
         dependencies: [wait-for-subnet-status]
+        templateRef:
+          name: workflow-base
+          template: from-key
+        arguments:
+          parameters:
+          - name: key
+            value: sbi-ip
+          - name: json_str
+            value: |
+              {{tasks.wait-for-subnet-status.outputs.parameters.payload}}
+
+      - name: get-up-ip
+        dependencies: [wait-for-subnet-status]
+        templateRef:
+          name: workflow-base
+          template: from-key
+        arguments:
+          parameters:
+          - name: key
+            value: up-ip
+          - name: json_str
+            value: |
+              {{tasks.wait-for-subnet-status.outputs.parameters.payload}}
+
+      - name: create-subnet-configure-subscription
+        dependencies: [get-sbi-ip, get-up-ip]
         template: create-subnet-configure-subscription
         arguments:
           parameters:
           - name: upf_sbi
-            value: "{{tasks.wait-for-subnet-status.outputs.parameters.sbi-ip}}"
+            value: "{{tasks.get-sbi-ip.outputs.result}}"
           - name: upf_up
-            value: "{{tasks.wait-for-subnet-status.outputs.parameters.up-ip}}"
+            value: "{{tasks.get-up-ip.outputs.result}}"
+
 
   - name: create-subnet-deploy-subscription
     resource:
@@ -245,70 +274,3 @@ spec:
       command: [sh]
       source: |
         kubectl get subscriptions.apps.open-cluster-management.io {{inputs.parameters.subscription_name}} -o json | jq '.status.statuses."{{inputs.parameters.cluster_name}}".packages."{{inputs.parameters.channel_name}}-{{inputs.parameters.cr_name}}-{{inputs.parameters.package_name}}".resourceStatus.outputs.parameters[0].value' | jq -r . | jq -r '.[] | select(.name=="{{inputs.parameters.namespace}}/{{inputs.parameters.network_name}}") | .ips[0]'
-
-  - name: consume
-    # Consumes a message from kafka broker
-    #
-    # Parameters
-    # kafka_topic: the topic to publish the message on (string)
-    # kafka_ip: ipaddress of the kafka broker (string)
-    # kafka_port: kafka broker port (number)
-    # msg_id: the id of the message to look for (str)
-    inputs:
-      parameters:
-      - name: kafka_topic
-      - name: kafka_ip
-      - name: kafka_port
-      - name: msg_id
-    script:
-      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
-      imagePullPolicy: IfNotPresent
-      command: [python]
-      source: |
-        import json
-        import os
-        import sys
-
-        from kafka import KafkaConsumer
-        from kafka.errors import KafkaError
-
-        KAFKA_TOPIC = '{{inputs.parameters.kafka_topic}}'
-        KAFKA_TIMEOUT = 10
-        KAFKA_API_VERSION = (1, 1, 0)
-
-        MSG_ID = "{{inputs.parameters.msg_id}}"
-        sbi_ip = ""
-        up_ip = ""
-
-        KAFKA_SERVER = "{}:{}".format("{{inputs.parameters.kafka_ip}}", "{{inputs.parameters.kafka_port}}")
-        consumer = KafkaConsumer(bootstrap_servers=KAFKA_SERVER,
-                                 client_id="aaa",
-                                 enable_auto_commit=True,
-                                 api_version=KAFKA_API_VERSION, group_id=MSG_ID)
-        consumer.subscribe(pattern=KAFKA_TOPIC)
-
-        for msg in consumer:
-            # TODO: drain topic messages first so we do not consume stale messages
-            payload = json.loads(msg.value.decode('utf-8', 'ignore'))
-            sys.stdout.write('Received payload: %s \n' % payload)
-            if payload['msg_id'] == MSG_ID:
-                sys.stdout.write('It is my message: %s \n' % payload)
-                sbi_ip = payload['sbi-ip']
-                up_ip = payload['up-ip']
-                break
-
-        with open('/tmp/sbi-ip.txt', 'w') as f:
-            f.write(sbi_ip)
-
-        with open('/tmp/up-ip.txt', 'w') as f:
-            f.write(up_ip)
-
-    outputs:
-      parameters:
-      - name: sbi-ip
-        valueFrom:
-          path: /tmp/sbi-ip.txt
-
-      - name: up-ip
-        valueFrom:
-          path: /tmp/up-ip.txt

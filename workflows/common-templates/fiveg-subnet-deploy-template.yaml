@@ -74,7 +74,9 @@ spec:
 
       - name: publish-status
         dependencies: [parse-upf-sbi-up]
-        template: produce
+        templateRef:
+          name: workflow-base
+          template: produce
         arguments:
           parameters:
           - name: kafka_ip
@@ -87,6 +89,7 @@ spec:
               { "msg_id": "{{workflow.parameters.msg_id}}",
                 "sbi-ip": "{{tasks.parse-upf-sbi-up.outputs.parameters.sbi-ip}}",
                 "up-ip": "{{tasks.parse-upf-sbi-up.outputs.parameters.up-ip}}",
+                "status": "COMPLETED"                
               }
           - name: kafka_topic
             value: "{{workflow.parameters.topic}}"

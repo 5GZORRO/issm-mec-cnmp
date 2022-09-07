@@ -30,13 +30,31 @@ spec:
     - name: cluster
       value: "OVERRIDE"
 
+    - name: kafka_port
+      value: 9092
+
   templates:
   - name: handlerequest
     dag:
       tasks:
       - name: create-core-subscription
-        # TODO: wait on status
         template: create-core-subscription
+
+      - name: wait-for-core
+        dependencies: [create-core-subscription]
+        templateRef:
+          name: workflow-base
+          template: consume
+        arguments:
+          parameters:
+          - name: kafka_ip
+            value: "{{workflow.parameters.kafka_ip}}"
+          - name: kafka_port
+            value: "{{workflow.parameters.kafka_port}}"
+          - name: kafka_topic
+            value: "{{workflow.parameters.cluster}}"
+          - name: msg_id
+            value: "deploy-{{workflow.name}}"
 
   - name: create-core-subscription
     resource:
@@ -68,3 +86,6 @@ spec:
               - name: networks
                 value: |
                   {{workflow.parameters.networks}}
+
+              - name: msg_id
+                value: "deploy-{{workflow.name}}"

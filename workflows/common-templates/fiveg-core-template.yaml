@@ -334,7 +334,6 @@ spec:
                   }
               }
 
-      # Example using a start/end range
       - name: subscribe-ues
         dependencies: [create-webconsole, create-smf]
         templateRef:
@@ -357,23 +356,25 @@ spec:
           start: "3"
           end: "8"
 
-#      - name: subscribe-ues
-#        dependencies: [create-webconsole, create-smf]
-#        templateRef:
-#          name: workflow-subscribe
-#          template: subscribe
-#        arguments:
-#          parameters:
-#          - name: webconsole_name
-#            # service name
-#            value: webconsole
-#          - name: core_namespace
-#            value: "{{workflow.namespace}}"
-#          - name: supi
-#            value: imsi-208930000000003
-#          - name: plmn
-#            value: 20893
+      - name: publish-status
+        dependencies: [subscribe-ues]
+        templateRef:
+          name: workflow-base
+          template: produce
+        arguments:
+          parameters:
+          - name: kafka_ip
+            value: "{{workflow.parameters.kafka_ip}}"
+          - name: kafka_port
+            value: "{{workflow.parameters.kafka_port}}"
 
+          - name: data
+            value: |
+              { "msg_id": "{{workflow.parameters.msg_id}}",
+                "status": "COMPLETED"
+              }
+          - name: kafka_topic
+            value: "{{workflow.parameters.topic}}"
 
   - name: register-ues
     inputs:

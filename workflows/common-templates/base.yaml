@@ -1,0 +1,119 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: workflow-base
+spec:
+  templates:
+  - name: from-key
+    inputs:
+      parameters:
+      - name: key
+      - name: json_str
+    script:
+      image: python:alpine3.6
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+
+        print({{inputs.parameters.json_str}}['{{inputs.parameters.key}}'])
+
+  - name: consume
+    # Consumes a message from kafka broker of a matched event_uuid
+    #
+    # Parameters
+    # kafka_topic: the topic to publish the message on (string)
+    # kafka_ip: ipaddress of the kafka broker (string)
+    # kafka_port: kafka broker port (number)
+    # msg_id: the id of the message to look for (str)
+    inputs:
+      parameters:
+      - name: kafka_topic
+      - name: kafka
+      - name: msg_id
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import os
+        import sys
+
+        from kafka import KafkaConsumer
+        from kafka.errors import KafkaError
+
+        KAFKA_TOPIC = '{{inputs.parameters.kafka_topic}}'
+        KAFKA_TIMEOUT = 10
+        KAFKA_API_VERSION = (1, 1, 0)
+
+        MSG_ID = "{{inputs.parameters.msg_id}}"
+        payload = {}
+
+        KAFKA_SERVER = "{}".format("{{inputs.parameters.kafka}}")
+        consumer = KafkaConsumer(bootstrap_servers=KAFKA_SERVER,
+                                 client_id="aaa",
+                                 enable_auto_commit=True,
+                                 api_version=KAFKA_API_VERSION, group_id=MSG_ID)
+        consumer.subscribe(pattern=KAFKA_TOPIC)
+
+        for msg in consumer:
+            # TODO: drain topic messages first so we do not consume stale messages
+            payload = json.loads(msg.value.decode('utf-8', 'ignore'))
+            sys.stdout.write('Received payload: %s \n' % payload)
+            if payload.get('msg_id', '') == MSG_ID:
+                sys.stdout.write('It is my message: %s \n' % payload)
+                break
+
+        with open('/tmp/payload.txt', 'w') as f:
+            # don't dump it - keep its format so that other python steps can parse it
+            f.write(str(payload))
+            #json.dump(payload, f)
+
+    outputs:
+      parameters:
+      - name: payload
+        valueFrom:
+          path: /tmp/payload.txt
+
+  - name: produce
+    # Publish a message into kafka broker
+    #
+    # Parameters
+    # kafka_topic: the topic to publish the message on (string)
+    # kafka_ip: ipaddress of the kafka broker (string)
+    # kafka_port: kafka broker port (number)
+    # data: the payload to publish (json)
+    inputs:
+      parameters:
+      - name: kafka_topic
+      - name: kafka_ip
+      - name: kafka_port
+      - name: data
+    script:
+      image: docker.pkg.github.com/5gzorro/issm/python:alpine3.6-kafka-v0.1
+      imagePullPolicy: IfNotPresent
+      command: [python]
+      source: |
+        import json
+        import os
+
+        from kafka import KafkaProducer
+        from kafka.errors import KafkaError
+
+        KAFKA_TOPIC = '{{inputs.parameters.kafka_topic}}'
+        KAFKA_TIMEOUT = 10
+        KAFKA_API_VERSION = (1, 1, 0)
+
+        KAFKA_SERVER = "{}:{}".format("{{inputs.parameters.kafka_ip}}", "{{inputs.parameters.kafka_port}}")
+        producer = KafkaProducer(bootstrap_servers=KAFKA_SERVER,
+                                 api_version=KAFKA_API_VERSION,
+                                 value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+
+        t = producer.send(KAFKA_TOPIC, {{inputs.parameters.data}})
+        # Block for 'synchronous' send; set timeout on X seconds
+        try:
+            t.get(timeout=KAFKA_TIMEOUT)
+        except KafkaError as ke:
+            print("1")
+        print ("0")
