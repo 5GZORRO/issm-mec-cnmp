@@ -182,6 +182,13 @@ def core():
                 "start": first ip in the range
                 "end": last ip in the range
     :type networks: ``list`` of ``dict``
+
+    :param kafka_ip: ipaddress of kafka for this issm-mec to use
+    :type kafka_ip: ``str`` in cidr format
+
+    :param kafka_port: port of kafka for this issm-mec to use
+    :type kafka_port: ``str`` in port int format
+
     """
     sys.stdout.write('Received core request\n')
     try:
@@ -192,13 +199,17 @@ def core():
         cluster= value['cluster']
         networks = value.get('networks')
 
+        kafka_ip = value.get('kafka_host', KAFKA_HOST)
+        kafka_port = str(value.get('kafka_port', KAFKA_PORT))
+
         with open('/fiveg-core.yaml') as f:
             _yaml = yaml.load(f, Loader=yaml.FullLoader)
 
         res_json = proxy_server.create_workflow(
             workflow_cr=_yaml, namespace=namespace,
             registry=registry,
-            cluster=cluster, networks=json.dumps(networks)
+            cluster=cluster, networks=json.dumps(networks),
+            kafka_ip=kafka_ip, kafka_port=kafka_port
         )
         response = flask.jsonify(res_json)
         response.status_code = 200
@@ -273,6 +284,12 @@ def subnet():
                 "start": first ip in the range
                 "end": last ip in the range
     :type networks: ``list`` of ``dict``
+
+    :param kafka_ip: ipaddress of kafka for this issm-mec to use
+    :type kafka_ip: ``str`` in cidr format
+
+    :param kafka_port: port of kafka for this issm-mec to use
+    :type kafka_port: ``str`` in port int format
     """
     sys.stdout.write('Received subnetslice request\n')
     try:
