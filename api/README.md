@@ -14,7 +14,7 @@ Invoke the below in this order
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:ade1cf0
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:831b931
 export NAMESPACE=issm-mec-cnmp
 export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
 ```
@@ -291,7 +291,7 @@ curl -X DELETE \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:ade1cf0
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:831b931
     ```
 
 1.  Invoke the below command.
