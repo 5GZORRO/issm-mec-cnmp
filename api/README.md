@@ -63,7 +63,7 @@ curl -X POST \
   http://192.168.1.117:30055/core \
   -H 'content-type: application/json' \
   -d '{
-  "cluster": "cluster-2",
+  "cluster": "cluster-1",
   "namespace": "domain-operator-a",
   "networks": [
       {
@@ -151,16 +151,16 @@ Example 2: slice attached to a local datanetwork
 
 ```bash
 curl -X POST \
-  http://192.168.1.117:30055/subnetslice \
+  http://10.4.2.206:30055/subnetslice \
   -H 'content-type: application/json' \
   -d '{
-  "cluster": "cluster-1",
-  "cluster_core": "cluster-2",
-  "namespace": "domain-operator-c",
+  "cluster": "cluster-2",
+  "cluster_core": "cluster-1",
+  "namespace": "domain-operator-a",
   "smf_name": "smf-sample",
   "core_namespace": "domain-operator-a",
   "sst": "1",
-  "sd": "112233",
+  "sd": "010203",
   "pool": "60.62.0.0/16",
   "connectedFrom": "gNB1",
   "network_name": "gilan",
@@ -174,8 +174,8 @@ curl -X POST \
         "start": "10.100.200.21", "end": "10.100.200.40"
     },
     {
-        "name": "up", "master": "ens3", "range": "192.168.1.0/24",
-        "start": "192.168.1.251", "end": "192.168.1.253"        
+        "name": "up", "master": "ens3", "range": "10.4.2.0/24",
+        "start": "10.4.2.251", "end": "10.4.2.253"        
     }
   ],
   "product_id": "EEyymp33AzSYHZFwvT8Bvp",
