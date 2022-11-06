@@ -171,8 +171,8 @@ def core():
     :param namespace: the namespace of the core to create
     :type namespace: ``str``
 
-    :param cluster_core: the cluster of where the core is to be deployed
-    :type cluster_core: ``str``
+    :param cluster: the cluster of where the core is to be deployed
+    :type cluster: ``str``
 
     :param networks: list of networks to create and used by the core network functions
             each entry includes the following attributes:

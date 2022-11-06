@@ -46,7 +46,7 @@ curl http://<ocm master ipaddress>:30055/hello
 Creates a core on a given (core) kubernetes cluster
 
 ```
-curl -X POST -d '{"cluster_core": "<string>"}' http://<ocm master ipaddress>:30055/core
+curl -X POST -d '{"cluster": "<string>"}' http://<ocm master ipaddress>:30055/core
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
@@ -86,7 +86,7 @@ curl -X POST \
 Creates a slice on a given (edge) kubernetes cluster
 
 ```
-curl -X POST -d '{"cluster_core": "<string>", "cluster_edge": "<string>", "sst": "<string>", "sd": "<string>", "smf_name": <string>}' http://<ocm master ipaddress>:30055/subnetslice
+curl -X POST -d '{"cluster_core": "<string>", "cluster": "<string>", "sst": "<string>", "sd": "<string>", "smf_name": <string>}' http://<ocm master ipaddress>:30055/subnetslice
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
