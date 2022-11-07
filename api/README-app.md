@@ -22,7 +22,7 @@ Data payload:
                    the supplied product_id has a valid license
 ```
 
-Example:
+Example (deploying vCache CR):
 
 ```bash
 curl -X POST \
@@ -33,7 +33,7 @@ curl -X POST \
   "namespace": "domain-operator-b",
   "image": "vcache_icom:latest",
   "api_version": "5g.ibm.com/v1alpha1",
-  "kind": "icomVcache",
+  "kind": "Vcache",
   "success_condition": "status.registered == true",
   "network_name": "gilan",
   "product_id": "EEyymp33AzSYHZFwvT8Bvp",

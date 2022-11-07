@@ -37,9 +37,9 @@ spec:
           - name: nf_kind
             value: "{{workflow.parameters.kind}}"
           - name: nf_name
-            value: "app-{{workflow.name}}"
+            value: "{{workflow.parameters.fiveg_app_id}}"
           - name: success_condition
-            value: "{{workflow.parameters.success_condition}}"
+            value: "status.outputs.podname == {{workflow.parameters.fiveg_app_id}}"
           - name: nf_spec
             value: |
               {

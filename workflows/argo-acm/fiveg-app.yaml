@@ -123,3 +123,6 @@ spec:
 
               - name: msg_id
                 value: "deploy-{{workflow.name}}"
+
+              - name: fiveg_app_id
+                value: "{{workflow.name}}"
