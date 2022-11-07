@@ -43,8 +43,10 @@ spec:
           - name: nf_spec
             value: |
               {
-                "image": "{{workflow.parameters.image}}",
-                "dataNetwork": "{{workflow.parameters.network_name}}"
+                "config": {
+                  "image": "{{workflow.parameters.image}}",
+                  "data_network_name": "{{workflow.parameters.network_name}}"
+                }
               }
 
       - name: publish-status

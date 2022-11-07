@@ -113,6 +113,9 @@ spec:
               - name: image
                 value: "{{workflow.parameters.image}}"
 
+              - name: network_name
+                value: "{{workflow.parameters.network_name}}"
+
               - name: kafka_ip
                 value: "{{workflow.parameters.kafka_ip}}"
               - name: kafka_port
