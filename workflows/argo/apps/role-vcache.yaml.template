@@ -1,0 +1,36 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "$NAMESPACE-vcache"
+  namespace: "$NAMESPACE"
+rules:
+- apiGroups:
+  - 5g.ibm.com
+  resources:
+  - vcaches
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "$NAMESPACE-vcache"
+  namespace: "$NAMESPACE"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "$NAMESPACE-vcache"
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: "$NAMESPACE"
+- kind: Group
+  name: system:serviceaccounts:default
+  apiGroup: rbac.authorization.k8s.io
+  namespace: "$NAMESPACE"

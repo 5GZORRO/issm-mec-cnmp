@@ -1,3 +1,31 @@
+## Apply application roles
+
+Do this for all edge clusters
+
+Have Argo to run application related workflows under `domain-operator-a` , `domain-operator-b`, `domain-operator-c`, namespaces.
+
+```
+cd ~/issm-mec-cnmp
+```
+
+```
+# operator-a
+export NAMESPACE=domain-operator-a
+kubectl create namespace $NAMESPACE
+envsubst < workflows/argo/apps/role-vcache.yaml.template | kubectl apply -n $NAMESPACE -f -
+
+# operator-b
+export NAMESPACE=domain-operator-b
+kubectl create namespace $NAMESPACE
+envsubst < workflows/argo/apps/role-vcache.yaml.template | kubectl apply -n $NAMESPACE -f -
+
+# operator-c
+export NAMESPACE=domain-operator-c
+kubectl create namespace $NAMESPACE
+envsubst < workflows/argo/apps/role-vcache.yaml.template | kubectl apply -n $NAMESPACE -f -
+```
+
+
 ## Deploy an application
 
 Log into OCM hub cluster
