@@ -12,6 +12,12 @@
     "pool": "60.61.0.0/16",
     "connectedFrom": "gNB1",
 
+    "network_name": "gilan",
+    "network_master": "ens3",
+    "network_range": "10.20.0.0/24",
+    "network_start": "10.20.0.2",
+    "network_end": "10.20.0.50",
+
     "networks": [
         {
             "name": "sbi",
