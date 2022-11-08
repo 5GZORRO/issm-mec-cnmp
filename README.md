@@ -144,15 +144,6 @@ Perform the [following](./docs/5g-operator.md) instructions to install the 5G Op
 
 Do this for both core and edge clusters
 
-## Application operators
-
-Similar to the 5G Operator, there is a folder of application operators (currently for vCache)
-
-Perform the [following](./docs/apps/vcache-operator.md) instructions to install it
-
-Do this for edge clusters
-
-
 ## gtp5g kernel module
 
 Perform the below instructions to install the gtp5g kernel module that will be used by the dataplane function
