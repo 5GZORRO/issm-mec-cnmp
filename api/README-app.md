@@ -35,7 +35,7 @@ curl -X POST \
   "success_condition": "status.registered == true",
   "config": {
     "image": "vcache_icom:latest",
-    "network_name": "gilan"
+    "data_network_name": "gilan"
   },
   "product_id": "EEyymp33AzSYHZFwvT8Bvp",
   "elma_url": "http://172.28.3.42:31880"
