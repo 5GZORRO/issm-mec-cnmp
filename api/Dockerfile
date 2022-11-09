@@ -18,4 +18,6 @@ ADD fiveg-core.yaml /
 ADD fiveg-subnet.yaml /
 ADD fiveg-subnet-delete.yaml /
 
+ADD fiveg-app.yaml /
+
 CMD ["/bin/bash", "-c", "cd apiServer && python -u server.py"]

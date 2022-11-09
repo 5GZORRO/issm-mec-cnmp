@@ -32,17 +32,14 @@ spec:
     - name: elma_url
       value: "OVERRIDE"
 
-    # these are application specifics that load the proper CR operator to be
+    # kind/api_version are application specifics that loads the proper CR operator to be
     # used as the VNFM
     - name: kind
     - name: api_version
+
+    - name: config
+
     - name: success_condition
-
-    - name: image
-      value: "OVERRIDE"
-
-    - name: network_name
-      value: "OVERRIDE"
 
     - name: kafka_ip
       value: "OVERRIDE"
@@ -99,22 +96,19 @@ spec:
               - name: registry
                 value: {{workflow.parameters.registry}}
 
+              - name: kind
+                value: "{{workflow.parameters.kind}}"
+              - name: api_version
+                value: "{{workflow.parameters.api_version}}"
+
+              - name: config
+                value: |
+                  {{workflow.parameters.config}}
+
               - name: product_id
                 value: "{{workflow.parameters.product_id}}"
               - name: elma_url
                 value: "{{workflow.parameters.elma_url}}"
-
-              - name: kind
-                value: "{{workflow.parameters.kind}}"
-
-              - name: api_version
-                value: "{{workflow.parameters.api_version}}"
-
-              - name: image
-                value: "{{workflow.parameters.image}}"
-
-              - name: network_name
-                value: "{{workflow.parameters.network_name}}"
 
               - name: kafka_ip
                 value: "{{workflow.parameters.kafka_ip}}"

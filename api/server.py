@@ -359,15 +359,108 @@ def subnet():
     return response
 
 
-@proxy.route("/core_subnetslice/<namespace>/<name>",  methods=['GET'])
-def get_core_subnetslice(namespace, name):
+@proxy.route("/app",  methods=['POST'])
+def app():
     """
-    Get a subnet slice.
+    Create an application.
+
+    :param registry: url to private image registry to be used for the deployment. Optional
+    :type registry: ``str``
+
+    :param namespace: the namespace of the subnetslice to create
+    :type namespace: ``str``
+
+    :param cluster: the (edge) cluster of which the subnet will be deployed
+    :type cluster: ``str``
+
+    :param kind: the kind of the k8s custom resource definition that manages the application
+    :type kind: ``str``
+
+    :param api_version: the api version of the k8s custom resource definition
+           that manages the application
+    :type api_version: ``str``
+
+    :param success_condition: application specific custom resource definition query
+                              to indicate a completion of application deployment
+    :type success_condition: ``str``
+
+    :param config: application specific configuration
+    :type config: ``json``
+
+    :param product_id: product offer DID of the application. Optional
+    :type product_id: ``str`` in uuid/DID format
+
+    :param elma_url:   url of license agent (http://<ip>:<port>) to verify that
+                       the supplied product_id has a valid license. Optional
+    :type elma_url: ``str``
+
+    :param kafka_ip: ipaddress of kafka for this issm-mec to use
+    :type kafka_ip: ``str`` in cidr format
+
+    :param kafka_port: port of kafka for this issm-mec to use
+    :type kafka_port: ``str`` in port int format
+    """
+    sys.stdout.write('Received subnetslice request\n')
+    try:
+        value = getMessagePayload()
+
+        namespace = value.get('namespace')
+        registry = value.get('registry', registry_private_free5gc)
+
+        kafka_ip = value.get('kafka_host', KAFKA_HOST)
+        kafka_port = str(value.get('kafka_port', KAFKA_PORT))
+
+        cluster = value['cluster']
+
+        api_version = value['api_version']
+        kind = value['kind']
+        config = value['config']
+
+        product_id = value.get('product_id', 'OVERRIDE')
+        elma_url = value.get('elma_url', 'OVERRIDE')
+
+        with open('/fiveg-app.yaml') as f:
+            _yaml = yaml.load(f, Loader=yaml.FullLoader)
+
+        res_json = proxy_server.create_workflow(
+            workflow_cr=_yaml, namespace=namespace,
+            registry=registry,
+            kafka_ip=kafka_ip, kafka_port=kafka_port,
+            kind=kind, cluster=cluster,
+            api_version=api_version,
+            config=config,
+            product_id=product_id, elma_url=elma_url
+        )
+        response = flask.jsonify(res_json)
+        response.status_code = 200
+        return response
+
+    except HTTPException as e:
+        sys.stdout.write('Exit /app %s\n' % str(e))
+        return e
+
+    except ApiException as e:
+        response = flask.jsonify({'error': 'Reason: %s. Body: %s'
+                                  % (e.reason, e.body)})
+        response.status_code = e.status
+
+    except Exception as e:
+        response = flask.jsonify({'error': 'Internal error. {}'.format(e)})
+        response.status_code = 500
+
+    sys.stdout.write('Exit /app %s\n' % str(response))
+    return response
+
+
+@proxy.route("/core_subnetslice/<namespace>/<name>",  methods=['GET'])
+def get_core_subnetslice_app(namespace, name):
+    """
+    Get core or subnet slice or application.
 
     :param namespace: the namespace of the subnetslice to retrieve
     :type namespace: ``str``
 
-    :param name: the name of the subnetslice to create
+    :param name: the name of the core/subnetslice/application to retrieve
     :type name: ``str``
     """
     try:

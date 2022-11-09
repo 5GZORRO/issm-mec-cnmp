@@ -4,9 +4,11 @@
 
     "cluster": "cluster-2",
 
-    "image": "vcache_icom:latest",
     "api_version": "5g.ibm.com/v1alpha1",
     "kind": "Vcache",
     "success_condition": "status.registered == true",
-    "network_name": "gilan"
+    "config": {
+        "image": "vcache_icom:latest",
+        "network_name": "gilan"
+    }
 }
