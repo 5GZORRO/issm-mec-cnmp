@@ -14,13 +14,13 @@ Invoke the below in this order
 
 ```
 export REGISTRY=docker.pkg.github.com
-export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:831b931
+export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:temp
 export NAMESPACE=issm-mec-cnmp
-export REGISTRY_PRIVATE_FREE5GC=84.88.32.158:5000
+export REGISTRY_PRIVATE_FREE5GC=10.4.2.227:5000
 ```
 
 ```
-export KAFKA_HOST=192.168.1.66
+export KAFKA_HOST=10.4.2.227
 export KAFKA_PORT=9092
 ```
 
@@ -60,7 +60,7 @@ Example:
 
 ```bash
 curl -X POST \
-  http://192.168.1.117:30055/core \
+  http://10.4.2.206:30055/core \
   -H 'content-type: application/json' \
   -d '{
   "cluster": "cluster-1",
@@ -70,7 +70,7 @@ curl -X POST \
           "name": "sbi", "master": "ens3", "range": "10.100.200.0/24", "start": "10.100.200.2", "end": "10.100.200.20"
       },
       {
-          "name": "ngap", "master": "ens3", "range": "192.168.1.0/24", "start": "192.168.1.250", "end": "192.168.1.250"
+          "name": "ngap", "master": "ens3", "range": "10.4.2.0/24", "start": "10.4.2.250", "end": "10.4.2.250"
       }
   ]
 }'
@@ -116,7 +116,7 @@ Example 1:
 
 ```bash
 curl -X POST \
-  http://192.168.1.117:30055/subnetslice \
+  http://10.4.2.206:30055/subnetslice \
   -H 'content-type: application/json' \
   -d '{
   "cluster": "cluster-1",
@@ -134,8 +134,8 @@ curl -X POST \
         "start": "10.100.200.21", "end": "10.100.200.40"
     },
     {
-        "name": "up", "master": "ens3", "range": "192.168.1.0/24",
-        "start": "192.168.1.251", "end": "192.168.1.253"        
+        "name": "up", "master": "ens3", "range": "10.4.2.0/24",
+        "start": "10.4.2.251", "end": "10.4.2.253"        
     }
   ],
   "product_id": "EEyymp33AzSYHZFwvT8Bvp",
@@ -204,7 +204,7 @@ Example:
 
 ```bash
 curl -X GET \
-  http://192.168.1.117:30055/core_subnetslice/domain-operator-b/fiveg-subnet-j7dlm
+  http://10.4.2.206:30055/core_subnetslice/domain-operator-b/fiveg-subnet-j7dlm
 
 {
   "name": "fiveg-subnet-j7dlm",
@@ -276,7 +276,7 @@ Example:
 
 ```bash
 curl -X DELETE \
-  http://192.168.1.117:30055/subnetslice/domain-operator-b/fiveg-subnet-j7dlm
+  http://10.4.2.206:30055/subnetslice/domain-operator-b/fiveg-subnet-j7dlm
 ```
 
 ## Build (**relevant for developers only**)
@@ -291,7 +291,7 @@ curl -X DELETE \
 1.  Set the `IMAGE` environment variable to hold the image.
 
     ```
-    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:831b931
+    $ export IMAGE=$REGISTRY/5gzorro/issm-mec-cnmp/api-server:temp
     ```
 
 1.  Invoke the below command.

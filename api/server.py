@@ -423,7 +423,7 @@ def app():
             kafka_ip=kafka_ip, kafka_port=kafka_port,
             kind=kind, cluster=cluster,
             api_version=api_version,
-            config=config,
+            config=json.dumps(config),
             product_id=product_id, elma_url=elma_url
         )
         response = flask.jsonify(res_json)

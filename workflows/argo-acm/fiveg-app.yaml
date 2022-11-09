@@ -36,7 +36,8 @@ spec:
 
     - name: config
 
-    - name: success_condition
+    # TODO: add
+    # - name: success_condition
 
     - name: kafka_ip
       value: "OVERRIDE"

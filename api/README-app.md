@@ -25,16 +25,16 @@ Example (deploying vCache CR):
 
 ```bash
 curl -X POST \
-  http://192.168.1.117:30055/app \
+  http://10.4.2.206:30055/app \
   -H 'content-type: application/json' \
   -d '{
-  "cluster": "cluster-1",
-  "namespace": "domain-operator-b",
+  "cluster": "cluster-2",
+  "namespace": "domain-operator-a",
   "api_version": "5g.ibm.com/v1alpha1",
   "kind": "Vcache",
   "success_condition": "status.registered == true",
   "config": {
-    "image": "10.4.2.227:5000/weit/vcache_icom:latest",
+    "image": "ghcr.io/5gzorro/issm-mec-cnmp/vcache_icom:latest",
     "data_network_name": "gilan"
   },
   "product_id": "EEyymp33AzSYHZFwvT8Bvp",
