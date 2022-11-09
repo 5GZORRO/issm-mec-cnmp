@@ -364,9 +364,6 @@ def app():
     """
     Create an application.
 
-    :param registry: url to private image registry to be used for the deployment. Optional
-    :type registry: ``str``
-
     :param namespace: the namespace of the subnetslice to create
     :type namespace: ``str``
 
@@ -405,7 +402,6 @@ def app():
         value = getMessagePayload()
 
         namespace = value.get('namespace')
-        registry = value.get('registry', registry_private_free5gc)
 
         kafka_ip = value.get('kafka_host', KAFKA_HOST)
         kafka_port = str(value.get('kafka_port', KAFKA_PORT))
@@ -424,7 +420,6 @@ def app():
 
         res_json = proxy_server.create_workflow(
             workflow_cr=_yaml, namespace=namespace,
-            registry=registry,
             kafka_ip=kafka_ip, kafka_port=kafka_port,
             kind=kind, cluster=cluster,
             api_version=api_version,

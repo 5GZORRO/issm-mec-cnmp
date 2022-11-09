@@ -21,9 +21,6 @@ spec:
   entrypoint: handlerequest
   arguments:
     parameters:
-    - name: registry
-      value: "OVERRIDE"
-
     - name: cluster
 
     - name: product_id
@@ -93,8 +90,6 @@ spec:
               value: {{workflow.name}}
             - path: spec.arguments.parameters
               value:
-              - name: registry
-                value: {{workflow.parameters.registry}}
 
               - name: kind
                 value: "{{workflow.parameters.kind}}"

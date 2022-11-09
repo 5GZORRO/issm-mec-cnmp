@@ -3,13 +3,13 @@
 Creates an application on a given (edge) kubernetes cluster, connecting it to the given datanetwork (of the slice)
 
 ```
-curl -X POST -d '{"cluster": "<string>", "kind": <string>, "api_version": <>, "success_condition": <string>, "config": {...}, ...}' http://<ocm master ipaddress>:30055/app
+curl -X POST -d '{"cluster": "<string>", "kind": <string>, "api_version": <string>, "success_condition": <string>, "config": {...}, ...}' http://<ocm master ipaddress>:30055/app
 
 REST path:
     ocm master ipaddress - ipaddress of OCM Hub.
 
 Data payload:
-    cluster             - the (edge) cluster of which the subnet will be deployed (str)
+    cluster             - the (edge) cluster of which the app will be deployed (str)
     namespace           - the namespace under which the subnet will be deployed (str)
 
     api_version         - CR api version (for loading application operator SDK) (str)
@@ -34,7 +34,7 @@ curl -X POST \
   "kind": "Vcache",
   "success_condition": "status.registered == true",
   "config": {
-    "image": "vcache_icom:latest",
+    "image": "10.4.2.227:5000/weit/vcache_icom:latest",
     "data_network_name": "gilan"
   },
   "product_id": "EEyymp33AzSYHZFwvT8Bvp",
