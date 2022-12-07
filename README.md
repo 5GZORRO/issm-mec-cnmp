@@ -193,9 +193,9 @@ Log into host installed with docker and has access to docker.pkg.github.com
 ```
 # Clone free5gc-compose project
 cd ~
-git clone git@github.ibm.com:WEIT/free5gc-compose.git
+git clone https://github.com/5GZORRO/free5gc-compose.git
 cd free5gc-compose
-git checkout e762f48-nf_build_upfs-dynamic_load-multilpe_gnbs-tls_volume
+git checkout e762f48-nf_build_upfs-dynamic_load-multiple_gnbs-tls_volume
 
 # clone free5gc v3.1.1
 cd base
@@ -204,14 +204,14 @@ git clone --recursive -b v3.1.1 -j `nproc` https://github.com/free5gc/free5gc.gi
 # replace smf
 cd free5gc/NFs
 rm -Rf smf
-git clone git@github.ibm.com:WEIT/smf.git
+git clone https://github.com/5GZORRO/free5gc-smf.git smf
 cd smf
 git checkout smf-84c979a-dynamic_load-multiple_gnbs
 
 # replace amf
 cd ~/free5gc-compose/base/free5gc/NFs
 rm -Rf amf
-git clone git@github.ibm.com:WEIT/amf.git
+git clone https://github.com/5GZORRO/free5gc-amf.git amf
 cd amf
 git checkout amf-03f9848-uelocation
 
